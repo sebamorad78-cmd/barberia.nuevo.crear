@@ -637,17 +637,66 @@
     }, { passive: true });
   }
 
+  /* Panel para armar maquetas a medida de cada local */
   function initDemoSwitch() {
+    var credit = $("#sellerCredit"), V = C.vendedor || {};
+    if (C.esDemo && V.nombre) {
+      credit.hidden = false;
+      credit.textContent = "Web de demostración · " + V.nombre + (V.whatsapp ? " — Quiero esta web" : "");
+      credit.href = V.whatsapp ? "https://wa.me/" + V.whatsapp + "?text=" + encodeURIComponent(V.mensaje || "") : "#inicio";
+    }
     if (!C.mostrarSelectorDemo) return;
-    var sw = $("#demoSwitch"); sw.hidden = false;
-    $$("button", sw).forEach(function (b) {
-      b.classList.toggle("is-active", b.getAttribute("data-mode") === C.modo);
+
+    var panel = $("#demoPanel"), form = $("#demoForm"), toggle = $("#demoToggle");
+    var mode = C.modo;
+    panel.hidden = false;
+    var P = C.params || {};
+    form.elements.nombre.value = P.nombre || "";
+    form.elements.eslogan.value = P.eslogan || "";
+    form.elements.wa.value = P.wa || "";
+    form.elements.dir.value = P.dir || "";
+    form.elements.ig.value = P.ig || "";
+    form.elements.color.value = C.color || getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#c8a35b";
+    var colorTouched = !!C.color;
+    form.elements.color.addEventListener("input", function () { colorTouched = true; });
+
+    function setOpen(o) { panel.classList.toggle("is-open", o); toggle.setAttribute("aria-expanded", o); }
+    toggle.addEventListener("click", function () { setOpen(!panel.classList.contains("is-open")); });
+    $("#demoClose").addEventListener("click", function () { setOpen(false); });
+
+    function paintModes() {
+      $$(".demo__modes button", panel).forEach(function (b) { b.classList.toggle("is-active", b.getAttribute("data-mode") === mode); });
+    }
+    paintModes();
+    $$(".demo__modes button", panel).forEach(function (b) {
       b.addEventListener("click", function () {
-        if (b.getAttribute("data-mode") === C.modo) return;
-        try { localStorage.setItem("demo-modo", b.getAttribute("data-mode")); } catch (e) {}
-        location.reload();
+        if (mode === b.getAttribute("data-mode")) return;
+        mode = b.getAttribute("data-mode");
+        colorTouched = false; // al cambiar de estilo usar su color por defecto
+        paintModes(); location.href = buildUrl(false, true);
       });
     });
+
+    function buildUrl(clean, keepOpen) {
+      var p = new URLSearchParams();
+      p.set("modo", mode);
+      ["nombre", "eslogan", "wa", "dir", "ig"].forEach(function (k) {
+        var v = form.elements[k].value.trim(); if (v) p.set(k, v);
+      });
+      if (colorTouched) p.set("color", form.elements.color.value.replace("#", ""));
+      if (clean) p.set("limpio", "1");
+      if (keepOpen) p.set("panel", "1");
+      return location.origin + location.pathname + "?" + p.toString();
+    }
+    form.addEventListener("submit", function (e) { e.preventDefault(); location.href = buildUrl(false, true); });
+    $("#demoReset").addEventListener("click", function () { location.href = location.pathname + "?modo=" + mode + "&panel=1"; });
+    $("#demoCopy").addEventListener("click", function () {
+      var url = buildUrl(true, false);
+      var done = function () { toast("Link copiado. Mandáselo al local por WhatsApp."); };
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(done, function () { window.prompt("Copiá este link:", url); });
+      else window.prompt("Copiá este link:", url);
+    });
+    if (P.panel === "1") setOpen(true);
   }
 
   function boot() {

@@ -9,10 +9,18 @@ Sitio estático (HTML + CSS + JS, sin instalar nada) con reserva de turnos onlin
 - Indicador "Abierto / Cerrado" en vivo, botón flotante de WhatsApp, barra de reserva fija en celular.
 - Dos estilos: **barbería** (oscuro y dorado) y **salón** (crema y rosa).
 
+## Usarla como maqueta para vender
+1. Abrí la web y tocá **"Personalizar demo"** (abajo a la izquierda).
+2. Elegí **Barbería** o **Salón**, escribí el nombre del local, la frase, el color de su marca, su WhatsApp, dirección e Instagram → **Aplicar**.
+3. **Copiar link para el cliente** genera un link con todo eso ya cargado y **sin el panel**, listo para mandarle por WhatsApp.
+4. En `js/config.js` completá `VENDEDOR` con tu nombre y WhatsApp: aparece en el pie como "Web de demostración · Tu nombre — Quiero esta web" para que el local te escriba.
+
+La reserva funciona de verdad en la demo (se guarda en el navegador), así el dueño puede probar el flujo completo.
+
 ## Cómo personalizar
 Todo se edita en **`js/config.js`**: modo, nombre, textos, servicios, precios, duraciones, horarios, equipo, fotos, contacto y FAQ.
 - `MODO = "barberia"` o `"salon"`.
-- `MOSTRAR_SELECTOR_DEMO = false` antes de publicar.
+- `MOSTRAR_SELECTOR_DEMO = false` cuando entregues la web a un cliente (oculta el panel y el aviso de demo).
 - Fotos propias: guardalas en `assets/fotos/` y usá `"assets/fotos/archivo.jpg"` en el config.
 
 ## Ver en tu compu

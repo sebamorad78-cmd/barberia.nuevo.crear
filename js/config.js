@@ -14,9 +14,17 @@
   // Cambiá esto a "salon" para la versión salón de belleza femenino.
   var MODO = "barberia";
 
-  // Muestra un selector flotante para alternar entre ambos modos (útil
-  // para ver la demo). Ponelo en false cuando publiques la web.
+  // Muestra el panel "Personalizar demo" (para armar maquetas a medida de
+  // cada local). Ponelo en false cuando entregues la web a un cliente.
   var MOSTRAR_SELECTOR_DEMO = true;
+
+  // TUS DATOS (quien vende la web). Aparecen en el pie y en el aviso de demo
+  // para que el local pueda contactarte. Dejá whatsapp vacío para ocultarlo.
+  var VENDEDOR = {
+    nombre: "Tu Estudio Web",
+    whatsapp: "5491100000000",
+    mensaje: "¡Hola! Vi la demo de la web de turnos y me interesa para mi local."
+  };
 
   var u = function (id, w) {
     return "https://images.unsplash.com/" + id + "?auto=format&fit=crop&q=75&w=" + (w || 1200);
@@ -168,16 +176,32 @@
   };
 
   /* ------------------------------------------------------------------ */
-  var guardado = null;
-  try { guardado = localStorage.getItem("demo-modo"); } catch (e) {}
-  if (MOSTRAR_SELECTOR_DEMO && (guardado === "barberia" || guardado === "salon")) MODO = guardado;
+  /* Personalización por link: ?modo=salon&nombre=...&color=%23aa3355&wa=...
+     Así podés mandarle a cada local una maqueta con su nombre sin tocar código. */
+  var q = {};
+  try { new URLSearchParams(location.search).forEach(function (v, k) { q[k] = v.trim(); }); } catch (e) {}
+  if (q.modo === "barberia" || q.modo === "salon") MODO = q.modo;
 
   var base = MODO === "salon" ? salon : barberia;
   var cfg = {};
   Object.keys(comunes).forEach(function (k) { cfg[k] = comunes[k]; });
   Object.keys(base).forEach(function (k) { cfg[k] = base[k]; });
+  cfg.contacto = Object.assign({}, comunes.contacto);
   cfg.modo = MODO;
-  cfg.mostrarSelectorDemo = MOSTRAR_SELECTOR_DEMO;
+
+  if (q.nombre) { cfg.nombre = q.nombre.slice(0, 60); cfg.nombreCorto = cfg.nombre; }
+  if (q.eslogan) cfg.eslogan = q.eslogan.slice(0, 80);
+  if (q.wa) cfg.contacto.whatsapp = q.wa.replace(/\D/g, "");
+  if (q.tel) cfg.contacto.telefono = q.tel.slice(0, 40);
+  if (q.dir) { cfg.contacto.direccion = q.dir.slice(0, 120); cfg.contacto.mapaQuery = cfg.contacto.direccion; }
+  if (q.ig) cfg.contacto.instagram = q.ig.replace(/^@/, "").replace(/[^\w.]/g, "");
+  if (/^#?[0-9a-f]{6}$/i.test(q.color || "")) cfg.color = "#" + q.color.replace("#", "");
+
+  // "limpio=1" oculta el panel de edición: es el link que le mandás al local.
+  cfg.mostrarSelectorDemo = MOSTRAR_SELECTOR_DEMO && q.limpio !== "1";
+  cfg.esDemo = MOSTRAR_SELECTOR_DEMO;
+  cfg.vendedor = VENDEDOR;
+  cfg.params = q;
 
   window.__NEGOCIO__ = cfg;
 })();
