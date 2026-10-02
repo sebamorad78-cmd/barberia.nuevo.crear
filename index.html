@@ -6,6 +6,11 @@
   <title>Reservá tu turno</title>
   <meta name="description" content="Reservá tu turno online en segundos. Servicios, precios, horarios y galería del local.">
   <meta name="theme-color" content="#0f0e0c">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Reservá tu turno online">
+  <meta property="og:description" content="Servicios, precios, horarios y reservas online en segundos.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=70">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c8a35b'/%3E%3Cpath d='M20 44 44 20M20 20l24 24' stroke='%230f0e0c' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +18,7 @@
   <link rel="stylesheet" href="css/styles.css?v=2026100202">
   <!-- La configuración se carga primero para aplicar el tema antes de pintar -->
   <script src="js/config.js?v=2026100202"></script>
+  <script src="js/store.js?v=2026100202"></script>
   <script>
     (function () {
       var C = window.__NEGOCIO__ || {}, r = document.documentElement;
@@ -90,6 +96,19 @@
         </header>
         <div class="tabs reveal" id="serviceTabs" role="tablist"></div>
         <div class="price-list" id="priceList"></div>
+      </div>
+    </section>
+
+    <!-- ============ PROMOS ============ -->
+    <section class="section section--tight" id="promos">
+      <div class="container">
+        <header class="section__head section__head--row reveal">
+          <div>
+            <p class="eyebrow"><span class="line"></span>Promos &amp; regalos</p>
+            <h2 class="section__title">Más motivos para <em>volver</em>.</h2>
+          </div>
+        </header>
+        <div class="promos" id="promoGrid"></div>
       </div>
     </section>
 
@@ -195,6 +214,12 @@
                   <h3 class="pane__title">¡Turno reservado!</h3>
                   <p class="pane__hint" id="successText"></p>
                   <div class="success__code">Código: <strong id="successCode"></strong></div>
+                  <div class="sena-box" id="successSena" hidden>
+                    <p class="sena-box__title">Para confirmar, aboná la seña de <strong id="senaMonto"></strong></p>
+                    <div class="sena-box__alias"><span>Alias</span><strong id="senaAlias"></strong><button type="button" id="senaCopy">Copiar</button></div>
+                    <p class="sena-box__note">Titular: <span id="senaTitular"></span>. Mandá el comprobante por WhatsApp. El resto se abona en el local.</p>
+                    <a class="btn btn--primary" id="senaPagar" target="_blank" rel="noopener" hidden>Pagar con Mercado Pago</a>
+                  </div>
                   <div class="success__actions">
                     <a class="btn btn--primary" id="waConfirm" target="_blank" rel="noopener">Confirmar por WhatsApp</a>
                     <a class="btn btn--ghost" id="gcalLink" target="_blank" rel="noopener">Agregar a Google Calendar</a>
@@ -214,11 +239,12 @@
                 <div><dt>Duración</dt><dd id="sumDur">—</dd></div>
               </dl>
               <div class="summary__total"><span>Total</span><strong id="sumTotal">$0</strong></div>
+              <div class="summary__sena" id="sumSena" hidden><span>Seña para reservar</span><strong></strong></div>
               <div class="summary__nav">
                 <button class="btn btn--ghost" id="prevBtn" type="button" hidden>Atrás</button>
                 <button class="btn btn--primary" id="nextBtn" type="button" disabled>Continuar</button>
               </div>
-              <p class="summary__note">Sin seña. Pagás en el local.</p>
+              <p class="summary__note" id="sumNote">Pagás el resto en el local.</p>
             </aside>
           </div>
         </div>
@@ -301,6 +327,8 @@
       <div class="demo__modes" role="group" aria-label="Estilo">
         <button type="button" data-mode="barberia">Barbería</button>
         <button type="button" data-mode="salon">Salón</button>
+        <button type="button" data-mode="spa">Spa / Estética</button>
+        <button type="button" data-mode="unas">Nail bar</button>
       </div>
       <label class="demo__field"><span>Nombre del local</span><input name="nombre" maxlength="60" placeholder="Ej: Barbería Don Carlos"></label>
       <label class="demo__field"><span>Frase principal</span><input name="eslogan" maxlength="80" placeholder="Ej: Cortes con estilo propio."></label>
@@ -310,12 +338,17 @@
       </div>
       <label class="demo__field"><span>Dirección</span><input name="dir" maxlength="120" placeholder="Calle 123, Ciudad"></label>
       <label class="demo__field"><span>Instagram</span><input name="ig" placeholder="@usuario"></label>
+      <div class="demo__row demo__row--2">
+        <label class="demo__field"><span>Ajustar precios %</span><input name="ajuste" type="number" step="5" min="-80" max="400" placeholder="Ej: 20 o -10"></label>
+        <label class="demo__check"><input type="checkbox" name="sena"><span>Pedir seña</span></label>
+      </div>
       <div class="demo__actions">
         <button type="submit" class="btn btn--primary btn--sm">Aplicar</button>
         <button type="button" class="btn btn--ghost btn--sm" id="demoReset">Restablecer</button>
       </div>
       <button type="button" class="btn btn--ghost btn--sm demo__copy" id="demoCopy">Copiar link para el cliente</button>
       <p class="demo__note">El link que copiás abre la web ya personalizada y sin este panel.</p>
+      <div class="demo__links"><a id="demoAdmin">Ver panel del dueño →</a><a id="demoVender" target="_blank" rel="noopener">Mi página de ventas →</a></div>
     </form>
   </div>
 

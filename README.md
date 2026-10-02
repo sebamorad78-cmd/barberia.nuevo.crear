@@ -1,33 +1,40 @@
-# Web de turnos — Barbería / Salón de belleza
+# Web de turnos para barberías, salones, spas y nail bars
 
-Sitio estático (HTML + CSS + JS, sin instalar nada) con reserva de turnos online.
+Sitio estático (HTML + CSS + JS, sin instalar nada) pensado como **maqueta para vender** a locales.
 
-## Qué incluye
-- Hero animado, servicios y precios por categoría, nosotros, galería con lightbox, equipo, opiniones, horarios + mapa, preguntas frecuentes.
-- **Reserva en 4 pasos**: servicio(s) → profesional → día y hora → datos. Calcula duración y total, respeta horarios, días cerrados, anticipación mínima y turnos ya tomados.
-- Al confirmar: mensaje armado por **WhatsApp**, botón a **Google Calendar** y descarga **.ics**.
-- Indicador "Abierto / Cerrado" en vivo, botón flotante de WhatsApp, barra de reserva fija en celular.
-- Dos estilos: **barbería** (oscuro y dorado) y **salón** (crema y rosa).
+## Las 3 páginas
 
-## Usarla como maqueta para vender
-1. Abrí la web y tocá **"Personalizar demo"** (abajo a la izquierda).
-2. Elegí **Barbería** o **Salón**, escribí el nombre del local, la frase, el color de su marca, su WhatsApp, dirección e Instagram → **Aplicar**.
-3. **Copiar link para el cliente** genera un link con todo eso ya cargado y **sin el panel**, listo para mandarle por WhatsApp.
-4. En `js/config.js` completá `VENDEDOR` con tu nombre y WhatsApp: aparece en el pie como "Web de demostración · Tu nombre — Quiero esta web" para que el local te escriba.
+| Página | Para qué sirve |
+|---|---|
+| `index.html` | La web del local: servicios y precios, promos, galería, equipo, opiniones, horarios, mapa, FAQ y **reserva online en 4 pasos** con seña. |
+| `admin.html` | **Panel del dueño** (PIN demo `1234`): agenda por profesional, turnos manuales, bloqueo de horarios, estados (atendido / no vino), clientes, recordatorios y pedido de reseñas por WhatsApp, y estadísticas. Viene con datos de ejemplo. |
+| `vender.html` | **Tu página comercial**: beneficios, demos en vivo de los 4 rubros, generador de demo con el nombre del local, cómo trabajás, planes y precios, preguntas frecuentes. |
 
-La reserva funciona de verdad en la demo (se guarda en el navegador), así el dueño puede probar el flujo completo.
+## 4 estilos
+`barberia` (oscuro y dorado) · `salon` (crema y rosa) · `spa` (verde salvia) · `unas` (nail bar, negro y nude).
+Cada uno tiene sus propios servicios, equipo, fotos, promos, opiniones y FAQ.
 
-## Cómo personalizar
-Todo se edita en **`js/config.js`**: modo, nombre, textos, servicios, precios, duraciones, horarios, equipo, fotos, contacto y FAQ.
-- `MODO = "barberia"` o `"salon"`.
-- `MOSTRAR_SELECTOR_DEMO = false` cuando entregues la web a un cliente (oculta el panel y el aviso de demo).
-- Fotos propias: guardalas en `assets/fotos/` y usá `"assets/fotos/archivo.jpg"` en el config.
+## Cómo vender con esto
+1. Mandale al local tu `vender.html`, o mostrásela en persona.
+2. En `index.html` tocá **"Personalizar demo"**: elegí estilo, nombre, frase, color, WhatsApp, dirección, Instagram, ajuste de precios (%) y si se pide seña → **Aplicar**.
+3. **Copiar link para el cliente** genera la web del local ya personalizada y sin el panel.
+4. Mostrale también el **panel del dueño** (`admin.html`, PIN `1234`). Si abrís la web y el panel en dos pestañas y reservás un turno, el panel avisa al instante.
+5. Si el local quiere probar solo, en `vender.html` está el generador "Mirá cómo quedaría tu web".
 
-## Ver en tu compu
-Abrí `index.html` en el navegador (o `python3 -m http.server` en esta carpeta).
+## Qué editar
+Todo está en **`js/config.js`**:
+- `VENDEDOR`: tu nombre, WhatsApp, email y **planes con precios** (se muestran en `vender.html` y en el pie de la demo).
+- `MODO`: estilo por defecto.
+- `comunes`: horarios, feriados, anticipación mínima, **seña** (porcentaje, alias, link de Mercado Pago), PIN del panel y contacto.
+- Cada estilo (`barberia`, `salon`, `spa`, `unas`): textos, servicios, precios, equipo, fotos, promos, opiniones y FAQ.
+- Fotos propias: guardalas en `assets/fotos/` y usá `"assets/fotos/archivo.jpg"`.
+- `MOSTRAR_SELECTOR_DEMO = false` cuando le entregues la web a un cliente (oculta el panel de demo, el aviso de demo y los datos de ejemplo).
+
+### Parámetros del link (opcional)
+`?modo=salon&nombre=Mi%20Local&eslogan=...&color=aa3355&wa=5491122334455&dir=...&ig=usuario&ajuste=15&sena=0&alias=mi.alias&limpio=1`
 
 ## Publicar
-Subí toda la carpeta a Hostinger, Netlify, Vercel o GitHub Pages. Si cambiás CSS/JS, actualizá el `?v=FECHA` en `index.html`.
+Subí toda la carpeta a Netlify (app.netlify.com/drop), Hostinger, Vercel o GitHub Pages. Si cambiás CSS/JS, actualizá el `?v=...` en los `.html`.
 
 ## Importante
-Por ahora las reservas se guardan **en el navegador de quien reserva** y te llegan por WhatsApp. Para tener una agenda central (panel del negocio, turnos bloqueados para todos, recordatorios automáticos) el próximo paso es conectar una base de datos (por ejemplo Supabase).
+Es una **maqueta**: los turnos se guardan en el navegador de quien la usa (perfecto para mostrar). Para un local real, el siguiente paso es conectar una base de datos (por ejemplo Supabase) para que web y panel compartan la agenda, con usuarios reales en lugar del PIN.

@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  // Cambiá esto a "salon" para la versión salón de belleza femenino.
+  // Estilos disponibles: "barberia", "salon", "spa" (estética) o "unas" (nail bar).
   var MODO = "barberia";
 
   // Muestra el panel "Personalizar demo" (para armar maquetas a medida de
@@ -23,7 +23,18 @@
   var VENDEDOR = {
     nombre: "Tu Estudio Web",
     whatsapp: "5491100000000",
-    mensaje: "¡Hola! Vi la demo de la web de turnos y me interesa para mi local."
+    mensaje: "¡Hola! Vi la demo de la web de turnos y me interesa para mi local.",
+    email: "ventas@tuestudioweb.com",
+    // Planes que ofrecés (se muestran en vender.html). Editá precios a gusto.
+    planes: [
+      { nombre: "Inicial", precio: "$90.000", periodo: "pago único", destacado: false,
+        incluye: ["Web con tu nombre, colores y fotos", "Servicios, precios y horarios", "Botón de WhatsApp y mapa", "Publicación y dominio .com.ar*", "1 ronda de cambios"] },
+      { nombre: "Turnos", precio: "$25.000", periodo: "por mes", destacado: true,
+        incluye: ["Todo lo del plan Inicial", "Reservas online 24/7", "Panel del dueño con agenda", "Cobro de señas", "Recordatorios por WhatsApp", "Soporte y cambios mensuales"] },
+      { nombre: "Premium", precio: "$45.000", periodo: "por mes", destacado: false,
+        incluye: ["Todo lo del plan Turnos", "Varias sucursales / profesionales ilimitados", "Sesión de fotos del local", "Gestión de Google Maps e Instagram", "Reporte mensual de clientes"] }
+    ],
+    notaPlanes: "*Dominio con costo aparte según disponibilidad. Precios de referencia."
   };
 
   var u = function (id, w) {
@@ -51,6 +62,17 @@
     },
     // Fechas puntuales cerradas (feriados, vacaciones) formato AAAA-MM-DD
     diasCerrados: ["2026-12-25", "2027-01-01"],
+    // Seña para confirmar el turno (baja muchísimo las ausencias).
+    sena: {
+      activa: true,
+      porcentaje: 20,
+      alias: "tunegocio.mp",         // alias de Mercado Pago / CBU
+      titular: "Tu Negocio SRL",
+      linkPago: ""                   // opcional: link de pago de Mercado Pago
+    },
+    // PIN del panel del dueño (admin.html). Es solo para la demo: para uso
+    // real hay que conectar un servidor con usuarios y contraseñas.
+    pinPanel: "1234",
     contacto: {
       whatsapp: "5491100000000", // código de país + número, sin + ni espacios
       telefono: "+54 9 11 0000-0000",
@@ -63,6 +85,13 @@
 
   /* ------------------------------------------------------------------ */
   var barberia = {
+    tipo: "Barbería",
+    schemaTipo: "BarberShop",
+    promos: [
+      { etiqueta: "Membresía", titulo: "Club Imperio", texto: "2 cortes + 2 perfilados de barba por mes, con prioridad de agenda.", precio: "$32.000 / mes" },
+      { etiqueta: "Regalo", titulo: "Gift card", texto: "Regalá un Ritual Imperio. Llega por WhatsApp con un diseño listo para mandar.", precio: "Desde $12.000" },
+      { etiqueta: "Martes y miércoles", titulo: "15% off antes de las 13 h", texto: "Aplicado automáticamente al pagar en el local.", precio: "Todas las semanas" }
+    ],
     nombre: "Barbería Imperio",
     nombreCorto: "Imperio",
     eslogan: "Oficio, navaja y buena charla.",
@@ -119,6 +148,13 @@
 
   /* ------------------------------------------------------------------ */
   var salon = {
+    tipo: "Salón de belleza",
+    schemaTipo: "BeautySalon",
+    promos: [
+      { etiqueta: "Novias", titulo: "Paquete novia", texto: "Prueba de peinado y maquillaje + día del evento, con atención a domicilio opcional.", precio: "Consultar" },
+      { etiqueta: "Regalo", titulo: "Gift card", texto: "El regalo que nunca falla. Elegí monto o servicio y lo enviamos por WhatsApp.", precio: "Desde $15.000" },
+      { etiqueta: "Primera visita", titulo: "10% off en color", texto: "En tu primer servicio de color, con diagnóstico gratuito incluido.", precio: "Nuevas clientas" }
+    ],
     nombre: "Maison Lumière",
     nombreCorto: "Lumière",
     eslogan: "Belleza que se toma su tiempo.",
@@ -175,14 +211,140 @@
     ]
   };
 
+
+  /* ------------------------------------------------------------------ */
+  var spa = {
+    tipo: "Spa & estética",
+    schemaTipo: "DaySpa",
+    nombre: "Salvia Spa",
+    nombreCorto: "Salvia",
+    eslogan: "Una pausa para volver a vos.",
+    descripcion: "Masajes, tratamientos faciales y corporales en un ambiente sereno. Profesionales matriculadas y productos dermatológicos.",
+    heroImagen: u("photo-1540555700478-4be289fbecef", 1800),
+    nosotrosImagen: u("photo-1544161515-4ab6ce6db874", 1200),
+    nosotrosTitulo: "Bienestar con criterio profesional.",
+    nosotrosTexto: [
+      "Salvia nació de una idea simple: que cuidarse no sea un lujo ocasional sino un hábito posible.",
+      "Cada tratamiento comienza con una evaluación personalizada. Trabajamos con aparatología habilitada y protocolos de bioseguridad."
+    ],
+    cifras: [
+      { valor: 7, sufijo: "", texto: "años de experiencia" },
+      { valor: 12, sufijo: "k+", texto: "sesiones realizadas" },
+      { valor: 5.0, sufijo: "★", texto: "en Google", decimales: 1 }
+    ],
+    servicios: [
+      { id: "descontracturante", categoria: "Masajes", nombre: "Masaje descontracturante", descripcion: "Espalda, cuello y hombros.", duracion: 50, precio: 24000, destacado: true },
+      { id: "relajante", categoria: "Masajes", nombre: "Masaje relajante", descripcion: "Cuerpo completo con aceites esenciales.", duracion: 60, precio: 26000 },
+      { id: "piedras", categoria: "Masajes", nombre: "Piedras calientes", descripcion: "Basalto volcánico y aromaterapia.", duracion: 75, precio: 32000 },
+      { id: "limpieza", categoria: "Facial", nombre: "Limpieza facial profunda", descripcion: "Extracción, máscara y alta frecuencia.", duracion: 60, precio: 22000, destacado: true },
+      { id: "dermaplaning", categoria: "Facial", nombre: "Dermaplaning", descripcion: "Exfoliación y luminosidad inmediata.", duracion: 45, precio: 20000 },
+      { id: "peeling", categoria: "Facial", nombre: "Peeling químico", descripcion: "Manchas, textura y poros.", duracion: 40, precio: 28000 },
+      { id: "drenaje", categoria: "Corporal", nombre: "Drenaje linfático", descripcion: "Técnica manual Vodder.", duracion: 60, precio: 25000 },
+      { id: "madero", categoria: "Corporal", nombre: "Maderoterapia", descripcion: "Modelado y reducción de medidas.", duracion: 50, precio: 23000 },
+      { id: "dayspa", categoria: "Experiencias", nombre: "Day spa", descripcion: "Masaje + facial + infusión. Para regalar.", duracion: 150, precio: 58000 }
+    ],
+    equipo: [
+      { id: "ines", nombre: "Inés", rol: "Cosmiatra · Faciales", foto: u("photo-1438761681033-6461ffad8d80", 700), servicios: ["limpieza", "dermaplaning", "peeling", "dayspa"] },
+      { id: "flor", nombre: "Florencia", rol: "Masoterapeuta", foto: u("photo-1508214751196-bcfd4ca60f91", 700), servicios: ["descontracturante", "relajante", "piedras", "drenaje", "madero", "dayspa"] },
+      { id: "marina", nombre: "Marina", rol: "Kinesióloga · Corporales", foto: u("photo-1531123897727-8f129e1688ce", 700), servicios: ["descontracturante", "drenaje", "madero"] }
+    ],
+    galeria: [
+      { src: u("photo-1540555700478-4be289fbecef"), alt: "Sala de masajes" },
+      { src: u("photo-1570172619644-dfd03ed5d881"), alt: "Tratamiento facial" },
+      { src: u("photo-1515377905703-c4788e51af15"), alt: "Piedras calientes" },
+      { src: u("photo-1600334089648-b0d9d3028eb2"), alt: "Ambiente del spa" },
+      { src: u("photo-1544161515-4ab6ce6db874"), alt: "Masaje" },
+      { src: u("photo-1519823551278-64ac92734fb1"), alt: "Detalle de tratamiento" }
+    ],
+    testimonios: [
+      { texto: "Salí como nueva. El descontracturante de Florencia es increíble.", autor: "Paula S.", estrellas: 5 },
+      { texto: "Me hicieron una evaluación de piel súper completa antes de empezar.", autor: "Romina L.", estrellas: 5 },
+      { texto: "Regalé un day spa a mi mamá y quedó encantada.", autor: "Martina V.", estrellas: 5 }
+    ],
+    faq: [
+      { p: "¿Necesito llevar algo?", r: "No, te damos bata, toalla y pantuflas. Te recomendamos llegar 10 minutos antes." },
+      { p: "¿Puedo atenderme embarazada?", r: "Sí, con tratamientos adaptados. Avisanos al reservar para asignarte la profesional indicada." },
+      { p: "¿Cómo cancelo o cambio mi turno?", r: "Con 24 h de anticipación la seña queda a favor para tu próximo turno." },
+      { p: "¿Tienen gift cards?", r: "Sí, de cualquier servicio o monto. Se envían por WhatsApp o impresas." }
+    ],
+    promos: [
+      { etiqueta: "Pack", titulo: "4 sesiones corporales", texto: "Maderoterapia o drenaje: llevá 4 y pagá 3. Válido por 60 días.", precio: "$69.000" },
+      { etiqueta: "Regalo", titulo: "Gift card Day Spa", texto: "La experiencia completa, lista para regalar con tarjeta digital.", precio: "$58.000" },
+      { etiqueta: "De a dos", titulo: "Masaje en pareja", texto: "Sala doble, misma hora, con espumante de cortesía.", precio: "20% off" }
+    ]
+  };
+
+  /* ------------------------------------------------------------------ */
+  var unas = {
+    tipo: "Nail bar",
+    schemaTipo: "NailSalon",
+    nombre: "Nude Nail Bar",
+    nombreCorto: "Nude",
+    eslogan: "Manos que hablan por vos.",
+    descripcion: "Semipermanente, esculpidas, kapping y nail art con diseños propios. Esterilización en autoclave y turnos puntuales.",
+    heroImagen: u("photo-1604654894610-df63bc536371", 1800),
+    nosotrosImagen: u("photo-1610992015732-2449b76344bc", 1200),
+    nosotrosTitulo: "Detalle, prolijidad y diseño.",
+    nosotrosTexto: [
+      "Somos un nail bar con identidad propia: cada set se piensa para tus manos, tu estilo y tu rutina.",
+      "Trabajamos con geles de primera línea, limas descartables y materiales esterilizados en autoclave."
+    ],
+    cifras: [
+      { valor: 5, sufijo: "", texto: "años creando sets" },
+      { valor: 30, sufijo: "k+", texto: "manos felices" },
+      { valor: 4.9, sufijo: "★", texto: "en Google", decimales: 1 }
+    ],
+    servicios: [
+      { id: "semi", categoria: "Manos", nombre: "Semipermanente", descripcion: "Esmaltado que dura hasta 21 días.", duracion: 60, precio: 14000, destacado: true },
+      { id: "kapping", categoria: "Manos", nombre: "Kapping gel", descripcion: "Refuerzo sobre uña natural.", duracion: 75, precio: 17000 },
+      { id: "esculpidas", categoria: "Manos", nombre: "Esculpidas en gel", descripcion: "Largo y forma a elección.", duracion: 120, precio: 26000, destacado: true },
+      { id: "service", categoria: "Manos", nombre: "Service de esculpidas", descripcion: "Relleno y nuevo esmaltado.", duracion: 90, precio: 20000 },
+      { id: "nailart", categoria: "Diseño", nombre: "Nail art", descripcion: "Diseño a mano alzada (por set).", duracion: 30, precio: 6000 },
+      { id: "retiro", categoria: "Diseño", nombre: "Retiro", descripcion: "Retiro cuidadoso + hidratación.", duracion: 20, precio: 4000 },
+      { id: "pedi", categoria: "Pies", nombre: "Pedicura spa", descripcion: "Exfoliación, cutículas y semipermanente.", duracion: 75, precio: 19000 },
+      { id: "combo", categoria: "Combos", nombre: "Manos + pies", descripcion: "Semipermanente en manos y pies.", duracion: 120, precio: 30000 }
+    ],
+    equipo: [
+      { id: "abril", nombre: "Abril", rol: "Fundadora · Esculpidas", foto: u("photo-1517841905240-472988babdf9", 700), servicios: "todos" },
+      { id: "juli", nombre: "Julieta", rol: "Nail art y diseño", foto: u("photo-1534528741775-53994a69daeb", 700), servicios: ["semi", "kapping", "nailart", "retiro", "service"] },
+      { id: "mica", nombre: "Micaela", rol: "Pedicura y kapping", foto: u("photo-1544005313-94ddf0286df2", 700), servicios: ["semi", "kapping", "retiro", "pedi", "combo"] }
+    ],
+    galeria: [
+      { src: u("photo-1604654894610-df63bc536371"), alt: "Semipermanente nude" },
+      { src: u("photo-1610992015732-2449b76344bc"), alt: "Esculpidas" },
+      { src: u("photo-1632345031435-8727f6897d53"), alt: "Nail art" },
+      { src: u("photo-1519014816548-bf5fe059798b"), alt: "Manicura" },
+      { src: u("photo-1607779097040-26e80aa78e66"), alt: "Colores de temporada" },
+      { src: u("photo-1522337660859-02fbefca4702"), alt: "Estación de trabajo" }
+    ],
+    testimonios: [
+      { texto: "Las esculpidas me duraron un mes perfectas. Abril es una artista.", autor: "Sol R.", estrellas: 5 },
+      { texto: "Lugar hermoso, todo esterilizado y súper puntuales.", autor: "Belén C.", estrellas: 5 },
+      { texto: "Mandé una foto de inspiración y quedaron idénticas.", autor: "Jazmín T.", estrellas: 5 }
+    ],
+    faq: [
+      { p: "¿Puedo llevar una foto de inspiración?", r: "¡Sí! Mandala por WhatsApp al reservar y te confirmamos tiempo y precio del diseño." },
+      { p: "¿Cuánto dura el semipermanente?", r: "Entre 15 y 21 días según el crecimiento y el cuidado de tus uñas." },
+      { p: "¿Cómo cancelo o cambio mi turno?", r: "Con 12 h de anticipación la seña queda a favor para tu próximo turno." },
+      { p: "¿Tienen garantía?", r: "Si algo se levanta en las primeras 72 h, lo reparamos sin cargo." }
+    ],
+    promos: [
+      { etiqueta: "Fidelidad", titulo: "Tu 6° service, gratis", texto: "Sumá sellos digitales en cada visita y canjealos cuando quieras.", precio: "Club Nude" },
+      { etiqueta: "Regalo", titulo: "Gift card", texto: "Regalá un set completo o elegí el monto. Llega por WhatsApp.", precio: "Desde $14.000" },
+      { etiqueta: "Amigas", titulo: "Vení con una amiga", texto: "Reservando dos turnos a la misma hora, 15% off para las dos.", precio: "15% off" }
+    ]
+  };
+
   /* ------------------------------------------------------------------ */
   /* Personalización por link: ?modo=salon&nombre=...&color=%23aa3355&wa=...
      Así podés mandarle a cada local una maqueta con su nombre sin tocar código. */
   var q = {};
   try { new URLSearchParams(location.search).forEach(function (v, k) { q[k] = v.trim(); }); } catch (e) {}
-  if (q.modo === "barberia" || q.modo === "salon") MODO = q.modo;
+  var MODOS = { barberia: barberia, salon: salon, spa: spa, unas: unas };
+  if (MODOS[q.modo]) MODO = q.modo;
+  if (!MODOS[MODO]) MODO = "barberia";
 
-  var base = MODO === "salon" ? salon : barberia;
+  var base = MODOS[MODO];
   var cfg = {};
   Object.keys(comunes).forEach(function (k) { cfg[k] = comunes[k]; });
   Object.keys(base).forEach(function (k) { cfg[k] = base[k]; });
@@ -195,6 +357,19 @@
   if (q.tel) cfg.contacto.telefono = q.tel.slice(0, 40);
   if (q.dir) { cfg.contacto.direccion = q.dir.slice(0, 120); cfg.contacto.mapaQuery = cfg.contacto.direccion; }
   if (q.ig) cfg.contacto.instagram = q.ig.replace(/^@/, "").replace(/[^\w.]/g, "");
+  // Ajuste de precios en % (ej: ajuste=15 sube 15%, ajuste=-10 baja 10%)
+  var aj = parseFloat(q.ajuste);
+  if (aj && aj > -90 && aj < 500) {
+    cfg.servicios = cfg.servicios.map(function (sv) {
+      var c = Object.assign({}, sv);
+      c.precio = Math.round(sv.precio * (1 + aj / 100) / 500) * 500;
+      return c;
+    });
+  }
+  if (q.moneda) cfg.moneda = q.moneda.slice(0, 4);
+  cfg.sena = Object.assign({}, comunes.sena);
+  if (q.sena === "0") cfg.sena.activa = false;
+  if (q.alias) cfg.sena.alias = q.alias.slice(0, 40);
   if (/^#?[0-9a-f]{6}$/i.test(q.color || "")) cfg.color = "#" + q.color.replace("#", "");
 
   // "limpio=1" oculta el panel de edición: es el link que le mandás al local.

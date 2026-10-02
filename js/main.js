@@ -35,10 +35,10 @@
   var safe = function (fn, name) {
     try { fn(); } catch (e) { if (window.console) console.warn("[" + name + "]", e); }
   };
-  var store = {
-    get: function () { try { return JSON.parse(localStorage.getItem("turnos-" + C.modo) || "[]"); } catch (e) { return []; } },
-    set: function (v) { try { localStorage.setItem("turnos-" + C.modo, JSON.stringify(v)); } catch (e) {} }
-  };
+  var T = window.__TURNOS__;
+  var store = { get: T.all, set: T.save };
+  var senaDe = function (total) { return C.sena && C.sena.activa ? Math.round(total * C.sena.porcentaje / 100 / 100) * 100 : 0; };
+  var conParams = function (url) { return url + location.search; };
   var toastTimer;
   var toast = function (msg) {
     var t = $("#toast"); t.textContent = msg; t.classList.add("is-on");
@@ -67,7 +67,7 @@
       descripcion: C.descripcion,
       eslogan: C.eslogan,
       nosotrosTitulo: C.nosotrosTitulo,
-      kicker: (C.modo === "salon" ? "Salón de belleza" : "Barbería") + " · Turnos online 24/7",
+      kicker: (C.tipo || "Turnos") + " · Turnos online 24/7",
       anio: "+" + (C.cifras[0] ? C.cifras[0].valor : 10)
     };
     $$("[data-bind]").forEach(function (el) {
@@ -185,6 +185,56 @@
     });
   }
 
+  /* ---------------- Promos ---------------- */
+  function initPromos() {
+    var box = $("#promoGrid"), list = C.promos || [];
+    if (!list.length) { $("#promos").hidden = true; return; }
+    box.innerHTML = list.map(function (p, i) {
+      var msg = "¡Hola " + C.nombre + "! Me interesa: " + p.titulo + ".";
+      return '<article class="promo reveal' + (i === 0 ? " promo--feat" : "") + '"><span class="promo__tag">' + esc(p.etiqueta) + "</span>" +
+        "<h3>" + esc(p.titulo) + "</h3><p>" + esc(p.texto) + '</p><div class="promo__foot"><strong>' + esc(p.precio) + "</strong>" +
+        '<a href="' + esc(waLink(msg)) + '" target="_blank" rel="noopener">Consultar →</a></div></article>';
+    }).join("");
+  }
+
+  /* Datos estructurados para Google (negocio local) */
+  function initSchema() {
+    var horas = [];
+    Object.keys(C.horarios).forEach(function (d) {
+      (C.horarios[d] || []).forEach(function (r) {
+        horas.push({ "@type": "OpeningHoursSpecification", dayOfWeek: "https://schema.org/" + ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][d], opens: r[0], closes: r[1] });
+      });
+    });
+    var precios = C.servicios.map(function (s) { return s.precio; });
+    var data = {
+      "@context": "https://schema.org", "@type": C.schemaTipo || "HealthAndBeautyBusiness",
+      name: C.nombre, description: C.descripcion, image: C.heroImagen, url: location.origin + location.pathname,
+      telephone: C.contacto.telefono, email: C.contacto.email,
+      address: { "@type": "PostalAddress", streetAddress: C.contacto.direccion },
+      sameAs: ["https://instagram.com/" + C.contacto.instagram],
+      priceRange: money(Math.min.apply(null, precios)) + " - " + money(Math.max.apply(null, precios)),
+      openingHoursSpecification: horas,
+      hasOfferCatalog: { "@type": "OfferCatalog", name: "Servicios", itemListElement: C.servicios.map(function (s) {
+        return { "@type": "Offer", price: s.precio, priceCurrency: "ARS", itemOffered: { "@type": "Service", name: s.nombre, description: s.descripcion } };
+      }) }
+    };
+    var el = document.createElement("script"); el.type = "application/ld+json"; el.textContent = JSON.stringify(data);
+    document.head.appendChild(el);
+    var d = $('meta[name="description"]'); if (d) d.setAttribute("content", C.nombre + ": " + C.descripcion);
+    [["og:title", C.nombre + " — Reservá tu turno online"], ["og:description", C.descripcion], ["og:image", C.heroImagen]].forEach(function (m) {
+      var t = $('meta[property="' + m[0] + '"]'); if (t) t.setAttribute("content", m[1]);
+    });
+  }
+
+  function initSenaCopy() {
+    var b = $("#senaCopy"); if (!b) return;
+    b.addEventListener("click", function () {
+      var a = C.sena.alias, ok = function () { toast("Alias copiado: " + a); };
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(a).then(ok, function () { window.prompt("Alias:", a); });
+      else window.prompt("Alias:", a);
+    });
+  }
+
   /* ---------------- Testimonios / FAQ / horarios / footer ---------------- */
   function initQuotes() {
     $("#quotes").innerHTML = C.testimonios.map(function (q) {
@@ -224,7 +274,8 @@
     $("#footerCols").innerHTML =
       "<div><h5>Explorar</h5><ul><li><a href=\"#servicios\">Servicios</a></li><li><a href=\"#galeria\">Galería</a></li><li><a href=\"#equipo\">Equipo</a></li><li><a href=\"#reservar\">Reservar</a></li></ul></div>" +
       "<div><h5>Contacto</h5><ul><li>" + esc(k.direccion) + '</li><li><a href="' + esc(waLink()) + '" target="_blank" rel="noopener">WhatsApp</a></li><li><a href="mailto:' + esc(k.email) + '">' + esc(k.email) + "</a></li></ul></div>" +
-      '<div><h5>Seguinos</h5><ul><li><a href="https://instagram.com/' + esc(k.instagram) + '" target="_blank" rel="noopener">Instagram</a></li></ul></div>';
+      '<div><h5>Seguinos</h5><ul><li><a href="https://instagram.com/' + esc(k.instagram) + '" target="_blank" rel="noopener">Instagram</a></li>' +
+      '<li><a href="' + esc(conParams("admin.html")) + '">Acceso para el local</a></li></ul></div>';
   }
 
   /* Abierto / cerrado en vivo */
@@ -260,13 +311,7 @@
       return capablePros();
     }
 
-    function isProFree(proId, dk, start, dur) {
-      return !store.get().some(function (b) {
-        if (b.pro !== proId || b.date !== dk) return false;
-        var bs = toMin(b.time), be = bs + b.dur;
-        return start < be && start + dur > bs;
-      });
-    }
+    function isProFree(proId, dk, start, dur) { return T.isProFree(proId, dk, start, dur); }
     function slotsFor(dk) {
       var d = parseKey(dk), dur = totalDur(), out = [];
       if (!dur) return out;
@@ -413,6 +458,10 @@
       $("#sumDate").textContent = st.date ? fmtLargo(parseKey(st.date)).replace(/^\w/, function (c) { return c.toUpperCase(); }) + (st.time ? " · " + st.time : "") : "—";
       $("#sumDur").textContent = svcs.length ? durTxt(totalDur()) : "—";
       $("#sumTotal").textContent = money(totalPrice());
+      var sn = senaDe(totalPrice()), sb = $("#sumSena");
+      sb.hidden = !sn;
+      if (sn) $("strong", sb).textContent = money(sn);
+      $("#sumNote").textContent = sn ? "Seña del " + C.sena.porcentaje + "%. El resto se paga en el local." : "Sin seña. Pagás en el local.";
 
       var ok = { 1: svcs.length > 0, 2: !!st.pro && capablePros().length > 0, 3: !!st.date && !!st.time, 4: true }[st.step];
       var next = $("#nextBtn");
@@ -475,9 +524,10 @@
         svcs: st.svcs.slice(), pro: pro, date: st.date, time: st.time, dur: dur, total: totalPrice(),
         nombre: f.elements.nombre.value.trim(), telefono: f.elements.telefono.value.trim(),
         email: f.elements.email.value.trim(), nota: f.elements.nota.value.trim(),
-        recordatorio: f.elements.recordatorio.checked, creado: new Date().toISOString()
+        recordatorio: f.elements.recordatorio.checked, creado: new Date().toISOString(),
+        estado: "confirmado", origen: "web", sena: senaDe(totalPrice()), propio: true
       };
-      var all = store.get(); all.push(b); store.set(all);
+      T.add(b);
       showSuccess(b);
       renderMine();
     }
@@ -489,8 +539,19 @@
       $("#successCode").textContent = b.code;
       var msg = "¡Hola " + C.nombre + "! Reservé un turno:\n" +
         "• " + names + "\n• Con: " + proName + "\n• " + fmtLargo(d) + " a las " + b.time + "\n• Total: " + money(b.total) +
-        "\n• A nombre de: " + b.nombre + " (" + b.telefono + ")" + (b.nota ? "\n• Nota: " + b.nota : "") + "\nCódigo: " + b.code;
+        "\n• A nombre de: " + b.nombre + " (" + b.telefono + ")" + (b.nota ? "\n• Nota: " + b.nota : "") +
+        (b.sena ? "\n• Seña: " + money(b.sena) + " (te envío el comprobante)" : "") + "\nCódigo: " + b.code;
       $("#waConfirm").href = waLink(msg);
+
+      var sb = $("#successSena");
+      sb.hidden = !b.sena;
+      if (b.sena) {
+        $("#senaMonto").textContent = money(b.sena);
+        $("#senaAlias").textContent = C.sena.alias;
+        $("#senaTitular").textContent = C.sena.titular;
+        var pl = $("#senaPagar");
+        pl.hidden = !C.sena.linkPago; if (C.sena.linkPago) pl.href = C.sena.linkPago;
+      }
 
       var s = new Date(d); s.setHours(0, toMin(b.time));
       var e = new Date(s.getTime() + b.dur * 60000);
@@ -521,7 +582,7 @@
     /* Mis turnos (guardados en este navegador) */
     function renderMine() {
       var now = dateKey(new Date());
-      var mine = store.get().filter(function (b) { return b.date >= now; }).sort(function (a, b) { return (a.date + a.time).localeCompare(b.date + b.time); });
+      var mine = store.get().filter(function (b) { return b.propio && b.estado !== "cancelado" && b.date >= now; }).sort(function (a, b) { return (a.date + a.time).localeCompare(b.date + b.time); });
       var box2 = $("#myBookings");
       box2.hidden = !mine.length;
       $("#myBookingsList").innerHTML = mine.map(function (b) {
@@ -534,7 +595,7 @@
       var b = e.target.closest("[data-cancel]"); if (!b) return;
       var code = b.getAttribute("data-cancel");
       if (!window.confirm("¿Cancelar el turno " + code + "?")) return;
-      store.set(store.get().filter(function (x) { return x.code !== code; }));
+      T.update(code, { estado: "cancelado", canceladoPor: "cliente" });
       renderMine(); toast("Turno cancelado.");
       if (st.step === 3) { renderCalendar(); renderSlots(); }
     });
@@ -656,6 +717,10 @@
     form.elements.wa.value = P.wa || "";
     form.elements.dir.value = P.dir || "";
     form.elements.ig.value = P.ig || "";
+    form.elements.ajuste.value = P.ajuste || "";
+    form.elements.sena.checked = P.sena !== "0";
+    $("#demoAdmin").href = conParams("admin.html");
+    $("#demoVender").href = "vender.html";
     form.elements.color.value = C.color || getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#c8a35b";
     var colorTouched = !!C.color;
     form.elements.color.addEventListener("input", function () { colorTouched = true; });
@@ -680,7 +745,8 @@
     function buildUrl(clean, keepOpen) {
       var p = new URLSearchParams();
       p.set("modo", mode);
-      ["nombre", "eslogan", "wa", "dir", "ig"].forEach(function (k) {
+      if (!form.elements.sena.checked) p.set("sena", "0");
+      ["nombre", "eslogan", "wa", "dir", "ig", "ajuste"].forEach(function (k) {
         var v = form.elements[k].value.trim(); if (v) p.set(k, v);
       });
       if (colorTouched) p.set("color", form.elements.color.value.replace("#", ""));
@@ -702,6 +768,9 @@
   function boot() {
     safe(initContent, "content");
     safe(initServices, "services");
+    safe(initPromos, "promos");
+    safe(initSchema, "schema");
+    safe(initSenaCopy, "sena");
     safe(initGallery, "gallery");
     safe(initTeam, "team");
     safe(initQuotes, "quotes");
