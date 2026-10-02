@@ -21,20 +21,28 @@
   // TUS DATOS (quien vende la web). Aparecen en el pie y en el aviso de demo
   // para que el local pueda contactarte. Dejá whatsapp vacío para ocultarlo.
   var VENDEDOR = {
-    nombre: "Tu Estudio Web",
-    whatsapp: "5492230000000",
-    mensaje: "¡Hola! Vi la demo de la web de turnos y me interesa para mi local.",
-    email: "ventas@tuestudioweb.com",
-    // Planes que ofrecés (se muestran en vender.html). Editá precios a gusto.
+    nombre: "Sebastian Morad",
+    whatsapp: "5492268516801",
+    mensaje: "¡Hola Sebastian! Vi la demo de la web de turnos y me interesa para mi local.",
+    email: "sebamorad46@gmail.com",
+    // Plan único (se muestra en vender.html). Editá precio o lo que incluye.
     planes: [
-      { nombre: "Inicial", precio: "$90.000", periodo: "pago único", destacado: false,
-        incluye: ["Web con tu nombre, colores y fotos", "Servicios, precios y horarios", "Botón de WhatsApp y mapa", "Publicación y dominio .com.ar*", "1 ronda de cambios"] },
-      { nombre: "Turnos", precio: "$25.000", periodo: "por mes", destacado: true,
-        incluye: ["Todo lo del plan Inicial", "Reservas online 24/7", "Panel del dueño con agenda", "Cobro de señas", "Recordatorios por WhatsApp", "Soporte y cambios mensuales"] },
-      { nombre: "Premium", precio: "$45.000", periodo: "por mes", destacado: false,
-        incluye: ["Todo lo del plan Turnos", "Varias sucursales / profesionales ilimitados", "Sesión de fotos del local", "Gestión de Google Maps e Instagram", "Reporte mensual de clientes"] }
+      { nombre: "Todo incluido", precio: "US$ 180", periodo: "por mes", destacado: true,
+        resumen: "Tu web con turnos online y todo el mantenimiento a cargo mío. Vos te ocupás de atender.",
+        incluye: [
+          "Web profesional con tu nombre, colores y fotos",
+          "Reservas online 24/7 con cobro de seña",
+          "Panel del dueño: agenda, clientes y estadísticas",
+          "Recordatorios y mensajes por WhatsApp",
+          "Cambios de horarios, feriados y vacaciones",
+          "Altas, bajas y cambios de personal",
+          "Actualización de servicios, precios, promos y fotos",
+          "Hosting, seguridad y mantenimiento técnico",
+          "Soporte directo por WhatsApp",
+          "Atención en persona en Mar del Plata"
+        ] }
     ],
-    notaPlanes: "*Dominio con costo aparte según disponibilidad. Precios de referencia."
+    notaPlanes: "Sin permanencia mínima. Dominio propio (.com.ar) con costo aparte, según disponibilidad."
   };
 
   var u = function (id, w) {

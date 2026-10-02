@@ -61,6 +61,16 @@
 .plan ul { list-style: none; padding: 0; margin: 6px 0 10px; display: grid; gap: 10px; flex: 1; font-size: 15px; }
 .plan li { padding-left: 26px; position: relative; }
 .plan li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 800; }
+.plans--single { grid-template-columns: 1fr; max-width: 980px; margin: 0 auto; }
+.plans--single .plan { display: grid; grid-template-columns: 1fr 1.15fr; gap: 40px; padding: 44px; align-items: center; transform: none; }
+.plan__side { display: grid; gap: 16px; align-content: start; }
+.plans--single .plan__price strong { font-size: clamp(3rem, 6vw, 4.4rem); }
+.plan__sum { margin: 0; color: var(--muted); font-size: 15.5px; }
+.plans--single .plan ul { margin: 0; padding-left: 40px; border-left: 1px solid var(--line); }
+@media (max-width: 820px) {
+  .plans--single .plan { grid-template-columns: 1fr; padding: 30px 24px; gap: 26px; }
+  .plans--single .plan ul { padding: 24px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+}
 .plans__note { text-align: center; color: var(--muted); font-size: 13px; margin: 30px 0 0; }
 
 .season { padding-top: 0; }

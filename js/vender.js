@@ -65,16 +65,24 @@
     var mes = (a + l) * p * 4.3;
     $("#cTotal").textContent = fmt(mes);
     var plan = (V.planes || []).filter(function (x) { return x.destacado; })[0];
-    $("#cNota").textContent = "Recuperando solo la mitad, son " + fmt(mes / 2) + " por mes" + (plan ? " (el plan " + plan.nombre + " cuesta " + plan.precio + " " + plan.periodo + ")." : ".");
+    $("#cNota").textContent = "Recuperando solo la mitad, son " + fmt(mes / 2) + " por mes" + (plan ? ". El abono mensual es de " + plan.precio + "." : ".");
   }
   ["#cAus", "#cPrecio", "#cPerdidos"].forEach(function (id) { $(id).addEventListener("input", calc); });
   calc();
 
-  $("#plans").innerHTML = (V.planes || []).map(function (pl) {
-    var msg = "¡Hola! Me interesa el plan " + pl.nombre + " para mi local.";
-    return '<article class="plan' + (pl.destacado ? " plan--feat" : "") + '">' + (pl.destacado ? '<span class="plan__badge">Más elegido</span>' : "") +
-      "<h3>" + esc(pl.nombre) + '</h3><p class="plan__price"><strong>' + esc(pl.precio) + "</strong><span>" + esc(pl.periodo) + "</span></p><ul>" +
-      pl.incluye.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + '</ul><a class="btn ' + (pl.destacado ? "btn--primary" : "btn--ghost") +
-      '" target="_blank" rel="noopener" href="' + esc(wa(msg)) + '">Quiero este plan</a></article>';
+  var planes = V.planes || [];
+  $("#plans").classList.toggle("plans--single", planes.length === 1);
+  $("#plans").innerHTML = planes.map(function (pl) {
+    var msg = "¡Hola Sebastian! Me interesa el plan " + pl.nombre + " para mi local.";
+    var single = planes.length === 1;
+    var items = pl.incluye.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("");
+    return '<article class="plan' + (pl.destacado ? " plan--feat" : "") + '">' + (pl.destacado && !single ? '<span class="plan__badge">Más elegido</span>' : "") +
+      (single ? '<div class="plan__side">' : "") +
+      "<h3>" + esc(pl.nombre) + '</h3><p class="plan__price"><strong>' + esc(pl.precio) + "</strong><span>" + esc(pl.periodo) + "</span></p>" +
+      (pl.resumen ? '<p class="plan__sum">' + esc(pl.resumen) + "</p>" : "") +
+      (single ? '<a class="btn btn--primary btn--lg" target="_blank" rel="noopener" href="' + esc(wa(msg)) + '">Quiero mi web</a></div>' : "") +
+      "<ul>" + items + "</ul>" +
+      (single ? "" : '<a class="btn ' + (pl.destacado ? "btn--primary" : "btn--ghost") + '" target="_blank" rel="noopener" href="' + esc(wa(msg)) + '">Quiero este plan</a>') +
+      "</article>";
   }).join("");
 })();
