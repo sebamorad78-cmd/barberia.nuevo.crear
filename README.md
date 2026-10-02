@@ -10,8 +10,13 @@ Sitio estático (HTML + CSS + JS, sin instalar nada) pensado como **maqueta para
 | `admin.html` | **Panel del dueño** (PIN demo `1234`): agenda por profesional, turnos manuales, bloqueo de horarios, estados (atendido / no vino), clientes, recordatorios y pedido de reseñas por WhatsApp, y estadísticas. Viene con datos de ejemplo. |
 | `vender.html` | **Tu página comercial**: beneficios, demos en vivo de los 4 rubros, generador de demo con el nombre del local, cómo trabajás, planes y precios, preguntas frecuentes. |
 
-## 4 estilos
-`barberia` (oscuro y dorado) · `salon` (crema y rosa) · `spa` (verde salvia) · `unas` (nail bar, negro y nude).
+## 4 estilos (paleta y tipografía propias, contraste verificado WCAG AA)
+| Rubro | Paleta | Tipografía | Sensación |
+|---|---|---|---|
+| `barberia` | carbón + latón | Fraunces | tradición, oficio |
+| `salon` | marfil + baya + champagne | Playfair Display | femenino, editorial |
+| `spa` | salvia + arena | Cormorant Garamond | calma, bienestar |
+| `unas` | negro + nude rosado | Instrument Serif | moderno, chic |
 Cada uno tiene sus propios servicios, equipo, fotos, promos, opiniones y FAQ.
 
 ## Cómo vender con esto

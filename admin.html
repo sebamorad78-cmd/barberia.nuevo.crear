@@ -8,26 +8,12 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c8a35b'/%3E%3Crect x='16' y='18' width='32' height='30' rx='4' fill='none' stroke='%230f0e0c' stroke-width='4'/%3E%3Cpath d='M16 28h32M26 14v8M38 14v8' stroke='%230f0e0c' stroke-width='4'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=2026100202">
-  <link rel="stylesheet" href="css/admin.css?v=2026100202">
-  <script src="js/config.js?v=2026100202"></script>
-  <script src="js/store.js?v=2026100202"></script>
-  <script>
-    (function () {
-      var C = window.__NEGOCIO__ || {}, r = document.documentElement;
-      r.setAttribute("data-theme", C.modo || "barberia");
-      if (C.color) {
-        var h = C.color, n = parseInt(h.slice(1), 16), R = n >> 16, G = (n >> 8) & 255, B = n & 255;
-        var mix = function (c) { return Math.round(c + (255 - c) * 0.28); };
-        var lum = (0.299 * R + 0.587 * G + 0.114 * B) / 255;
-        r.style.setProperty("--accent", h);
-        r.style.setProperty("--accent-2", "rgb(" + mix(R) + "," + mix(G) + "," + mix(B) + ")");
-        r.style.setProperty("--on-accent", lum > 0.6 ? "#14110b" : "#ffffff");
-      }
-    })();
-  </script>
-  <script src="js/admin.js?v=2026100202" defer></script>
+  <link rel="stylesheet" href="css/styles.css?v=2026100301">
+  <link rel="stylesheet" href="css/admin.css?v=2026100301">
+  <script src="js/config.js?v=2026100301"></script>
+  <script src="js/store.js?v=2026100301"></script>
+  <script src="js/theme.js?v=2026100301"></script>
+  <script src="js/admin.js?v=2026100301" defer></script>
 </head>
 <body class="admin">
 

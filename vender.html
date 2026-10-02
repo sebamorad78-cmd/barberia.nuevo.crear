@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=2026100202">
-  <link rel="stylesheet" href="css/vender.css?v=2026100202">
-  <script src="js/config.js?v=2026100202"></script>
-  <script src="js/vender.js?v=2026100202" defer></script>
+  <link rel="stylesheet" href="css/styles.css?v=2026100301">
+  <link rel="stylesheet" href="css/vender.css?v=2026100301">
+  <script src="js/config.js?v=2026100301"></script>
+  <script src="js/vender.js?v=2026100301" defer></script>
 </head>
 <body class="sell">
   <header class="nav is-scrolled" id="nav">
@@ -39,7 +39,7 @@
     <section class="s-hero">
       <div class="container s-hero__grid">
         <div>
-          <p class="eyebrow"><span class="line"></span>Para barberías, peluquerías, spas y nail bars</p>
+          <p class="eyebrow"><span class="line"></span>Barberías, peluquerías, spas y nail bars · Mar del Plata</p>
           <h1 class="s-hero__title">Tu local recibe turnos <em>mientras dormís</em>.</h1>
           <p class="s-hero__lead">Una web profesional con tu marca, reservas online con seña, agenda para tu equipo y recordatorios por WhatsApp. Sin comisiones por turno y sin que tengas que saber de tecnología.</p>
           <div class="hero__cta">
@@ -73,6 +73,20 @@
       </div>
     </section>
 
+    <!-- Temporada -->
+    <section class="section season">
+      <div class="container season__grid">
+        <div>
+          <p class="eyebrow"><span class="line"></span>Por qué ahora</p>
+          <h2 class="section__title">En temporada, gana el que <em>aparece primero</em>.</h2>
+        </div>
+        <div class="season__text">
+          <p>Cada verano Mar del Plata recibe millones de turistas que buscan en Google “barbería cerca”, “peluquería en Güemes” o “manicura Playa Grande”. Eligen al que tiene fotos, precios claros y un botón para reservar ya.</p>
+          <p>Fuera de temporada, la web trabaja para tus clientes de siempre: reservan solos, reciben recordatorios y vuelven más seguido.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Beneficios -->
     <section class="section section--alt" id="beneficios">
       <div class="container">
@@ -87,6 +101,27 @@
           <article><span>04</span><h3>WhatsApp integrado</h3><p>Recordatorios, pedido de reseñas y mensajes de "te extrañamos" a clientes que no vuelven, con un toque.</p></article>
           <article><span>05</span><h3>Clientes y números</h3><p>Quién viene más, cuánto gasta, servicios más pedidos, días fuertes y facturación por profesional.</p></article>
           <article><span>06</span><h3>Aparecés en Google</h3><p>Web rápida y preparada para buscadores, con tus servicios, precios, horarios y ubicación en el mapa.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Calculadora -->
+    <section class="section" id="calculadora">
+      <div class="container calc">
+        <div>
+          <p class="eyebrow"><span class="line"></span>Hacé la cuenta</p>
+          <h2 class="section__title">¿Cuánto te cuesta <em>un turno vacío</em>?</h2>
+          <p class="section__sub">Mové los valores con los números de tu local. La seña online y los recordatorios atacan justo esto.</p>
+        </div>
+        <div class="calc__card">
+          <label class="calc__row"><span>Ausencias por semana</span><input type="range" id="cAus" min="1" max="25" value="6"><output id="oAus">6</output></label>
+          <label class="calc__row"><span>Precio promedio del servicio</span><input type="range" id="cPrecio" min="5000" max="60000" step="1000" value="15000"><output id="oPrecio">$15.000</output></label>
+          <label class="calc__row"><span>Turnos que hoy perdés por no contestar a tiempo (por semana)</span><input type="range" id="cPerdidos" min="0" max="25" value="4"><output id="oPerdidos">4</output></label>
+          <div class="calc__result">
+            <span>Plata que se te va por mes</span>
+            <strong id="cTotal">$0</strong>
+            <small id="cNota"></small>
+          </div>
         </div>
       </div>
     </section>
@@ -137,6 +172,31 @@
       </div>
     </section>
 
+    <!-- Comparativa -->
+    <section class="section" id="comparativa">
+      <div class="container">
+        <header class="section__head section__head--center">
+          <p class="eyebrow"><span class="line"></span>Comparalo<span class="line"></span></p>
+          <h2 class="section__title">Lo que tenés hoy vs. <em>lo que podés tener</em>.</h2>
+        </header>
+        <div class="table-scroll">
+          <table class="compare">
+            <thead><tr><th></th><th>Agenda por WhatsApp</th><th>Apps de turnos genéricas</th><th class="is-us">Tu web propia</th></tr></thead>
+            <tbody>
+              <tr><td>Reservas 24/7 sin contestar mensajes</td><td>—</td><td>✓</td><td class="is-us">✓</td></tr>
+              <tr><td>Tu marca, tus colores y tu dominio</td><td>—</td><td>—</td><td class="is-us">✓</td></tr>
+              <tr><td>Sin comisión por turno</td><td>✓</td><td>A veces</td><td class="is-us">✓</td></tr>
+              <tr><td>Cobro de seña</td><td>Manual</td><td>✓</td><td class="is-us">✓</td></tr>
+              <tr><td>Galería, promos, gift cards y opiniones</td><td>—</td><td>Limitado</td><td class="is-us">✓</td></tr>
+              <tr><td>Aparecer en Google con tu propia web</td><td>—</td><td>—</td><td class="is-us">✓</td></tr>
+              <tr><td>Clientes y estadísticas del local</td><td>—</td><td>✓</td><td class="is-us">✓</td></tr>
+              <tr><td>Atención de alguien de Mar del Plata</td><td>—</td><td>—</td><td class="is-us">✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- Planes -->
     <section class="section section--alt" id="planes">
       <div class="container">
@@ -162,6 +222,8 @@
           <details><summary>¿Puedo seguir tomando turnos por WhatsApp o en el local?</summary><p>Sí. Los cargás en el panel en segundos y la web bloquea ese horario automáticamente.</p></details>
           <details><summary>¿Cómo cobro la seña?</summary><p>Con tu alias o link de Mercado Pago. El cliente ve el monto y el alias al reservar, y te manda el comprobante.</p></details>
           <details><summary>¿Y si ya tengo dominio o Instagram?</summary><p>Usamos tu dominio si ya lo tenés, y sumamos el botón de reservas en tu Instagram y en Google Maps.</p></details>
+          <details><summary>¿Y si ya uso una app de turnos?</summary><p>Podés seguir usándola mientras probás. Muchos locales se pasan porque quieren su propia marca, dejar de pagar comisiones y que el cliente reserve desde su web o Instagram.</p></details>
+          <details><summary>¿Atendés en persona?</summary><p>Sí, en Mar del Plata te visito en el local para armar todo y enseñarte a usar el panel.</p></details>
           <details><summary>¿Puedo dar de baja cuando quiera?</summary><p>Sí, sin permanencia mínima en los planes mensuales.</p></details>
         </div>
       </div>

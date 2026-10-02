@@ -14,27 +14,12 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c8a35b'/%3E%3Cpath d='M20 44 44 20M20 20l24 24' stroke='%230f0e0c' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=2026100202">
+  <link rel="stylesheet" href="css/styles.css?v=2026100301">
   <!-- La configuración se carga primero para aplicar el tema antes de pintar -->
-  <script src="js/config.js?v=2026100202"></script>
-  <script src="js/store.js?v=2026100202"></script>
-  <script>
-    (function () {
-      var C = window.__NEGOCIO__ || {}, r = document.documentElement;
-      r.setAttribute("data-theme", C.modo || "barberia");
-      if (C.color) {
-        // Color de marca elegido: genera variante clara y color de texto legible
-        var h = C.color, n = parseInt(h.slice(1), 16), R = n >> 16, G = (n >> 8) & 255, B = n & 255;
-        var mix = function (c) { return Math.round(c + (255 - c) * 0.28); };
-        var lum = (0.299 * R + 0.587 * G + 0.114 * B) / 255;
-        r.style.setProperty("--accent", h);
-        r.style.setProperty("--accent-2", "rgb(" + mix(R) + "," + mix(G) + "," + mix(B) + ")");
-        r.style.setProperty("--on-accent", lum > 0.6 ? "#14110b" : "#ffffff");
-      }
-    })();
-  </script>
-  <script src="js/main.js?v=2026100202" defer></script>
+  <script src="js/config.js?v=2026100301"></script>
+  <script src="js/store.js?v=2026100301"></script>
+  <script src="js/theme.js?v=2026100301"></script>
+  <script src="js/main.js?v=2026100301" defer></script>
 </head>
 <body>
   <a class="skip" href="#reservar">Ir a reservar</a>
@@ -79,6 +64,7 @@
           <a href="#reservar" class="btn btn--primary btn--lg">Reservar ahora <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           <a href="#servicios" class="btn btn--ghost btn--lg">Ver precios</a>
         </div>
+        <a href="#reservar" class="next-slot" id="nextSlot" hidden><i></i><span class="next-slot__l">Próximo turno disponible:</span><span class="next-slot__s">Próximo turno:</span> <strong></strong><span aria-hidden="true">→</span></a>
         <ul class="hero__stats" id="heroStats"></ul>
       </div>
       <a href="#marquee" class="hero__scroll" aria-label="Seguir bajando"><span></span></a>
@@ -155,6 +141,17 @@
       </div>
     </section>
 
+    <!-- ============ TESTIMONIOS ============ -->
+    <section class="section section--alt" id="opiniones">
+      <div class="container">
+        <header class="section__head section__head--center reveal">
+          <p class="eyebrow"><span class="line"></span>Opiniones<span class="line"></span></p>
+          <h2 class="section__title">Lo que dicen <em>quienes vuelven</em>.</h2>
+        </header>
+        <div class="quotes" id="quotes"></div>
+      </div>
+    </section>
+
     <!-- ============ RESERVA ============ -->
     <section class="section booking-section" id="reservar">
       <div class="container">
@@ -205,6 +202,7 @@
                   <label class="field"><span>Email (opcional)</span><input name="email" type="email" autocomplete="email" placeholder="tu@email.com"></label>
                   <label class="field field--full"><span>¿Algo que debamos saber? (opcional)</span><textarea name="nota" rows="3" placeholder="Referencias, alergias, foto de inspiración por WhatsApp…"></textarea></label>
                   <label class="check field--full"><input type="checkbox" name="recordatorio" checked><span>Quiero recibir recordatorio por WhatsApp</span></label>
+                  <p class="terms field--full">Al confirmar aceptás las <a href="#" data-legal="condiciones">condiciones de reserva</a> y la <a href="#" data-legal="privacidad">política de privacidad</a>.</p>
                 </form>
               </div>
               <!-- Éxito -->
@@ -256,17 +254,6 @@
       </div>
     </section>
 
-    <!-- ============ TESTIMONIOS ============ -->
-    <section class="section section--alt" id="opiniones">
-      <div class="container">
-        <header class="section__head section__head--center reveal">
-          <p class="eyebrow"><span class="line"></span>Opiniones<span class="line"></span></p>
-          <h2 class="section__title">Lo que dicen <em>quienes vuelven</em>.</h2>
-        </header>
-        <div class="quotes" id="quotes"></div>
-      </div>
-    </section>
-
     <!-- ============ HORARIOS + UBICACIÓN ============ -->
     <section class="section" id="horarios">
       <div class="container visit">
@@ -275,8 +262,9 @@
           <h2 class="section__title">Te <em>esperamos</em>.</h2>
           <table class="hours" id="hoursTable"></table>
           <ul class="contact" id="contactList"></ul>
+          <div class="pay"><span>Medios de pago</span><ul class="pay-list"></ul></div>
         </div>
-        <div class="visit__map reveal"><iframe id="mapFrame" title="Mapa de ubicación" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+        <div class="visit__map reveal"><iframe id="mapFrame" title="Mapa de ubicación" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a class="btn btn--primary btn--sm map-go" id="mapGo" target="_blank" rel="noopener">Cómo llegar →</a></div>
       </div>
     </section>
 
@@ -308,7 +296,7 @@
       </div>
       <div class="footer__cols" id="footerCols"></div>
     </div>
-    <div class="container footer__bottom"><span>© <span id="year"></span> <span data-bind="nombre"></span>. Todos los derechos reservados.</span><a class="seller" id="sellerCredit" target="_blank" rel="noopener" hidden></a><a href="#inicio">Volver arriba ↑</a></div>
+    <div class="container footer__bottom"><span>© <span id="year"></span> <span data-bind="nombre"></span>. Todos los derechos reservados.</span><span class="footer__legal"><a href="#" data-legal="privacidad">Privacidad</a><a href="#" data-legal="condiciones">Condiciones de reserva</a></span><a class="seller" id="sellerCredit" target="_blank" rel="noopener" hidden></a><a href="#inicio">Volver arriba ↑</a></div>
   </footer>
 
   <!-- Barra fija móvil -->
@@ -359,6 +347,14 @@
     <img alt="">
     <button class="lightbox__nav lightbox__nav--next" aria-label="Siguiente">›</button>
   </div>
+
+  <dialog class="legal" id="legal" aria-labelledby="legalTitle">
+    <div class="legal__card">
+      <header><h2 id="legalTitle"></h2><button type="button" data-close-legal aria-label="Cerrar">×</button></header>
+      <div class="legal__body" id="legalBody"></div>
+      <button type="button" class="btn btn--primary btn--sm" data-close-legal>Entendido</button>
+    </div>
+  </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

@@ -46,13 +46,27 @@
   };
   var svcById = function (id) { return C.servicios.filter(function (s) { return s.id === id; })[0]; };
   var proById = function (id) { return C.equipo.filter(function (p) { return p.id === id; })[0]; };
-  var fallbackImg = function (img) {
-    img.addEventListener("error", function () {
+  /* Si una foto no carga, se reemplaza por un fondo elegante con monograma
+     (nunca un ícono roto). Las que cargan aparecen con un fundido suave. */
+  var fallbackImg = function (img, letra) {
+    var fail = function () {
+      if (!img.parentNode) return;
       var d = document.createElement("div");
-      d.className = "img-fallback"; d.textContent = "Tu foto acá";
-      if (img.parentNode) img.parentNode.replaceChild(d, img);
-    }, { once: true });
+      d.className = "img-fallback";
+      d.innerHTML = '<span class="img-fallback__mono">' + esc((letra || C.nombreCorto || C.nombre || "·").charAt(0).toUpperCase()) + "</span>" +
+        (C.esDemo ? "<small>Espacio para tu foto</small>" : "");
+      img.parentNode.replaceChild(d, img);
+    };
+    var ok = function () { img.classList.add("is-loaded"); };
+    img.classList.add("fade-img");
+    if (img.complete && img.getAttribute("src")) { if (img.naturalWidth > 0) ok(); else fail(); }
+    else {
+      img.addEventListener("error", fail, { once: true });
+      img.addEventListener("load", ok, { once: true });
+    }
   };
+  // Red de seguridad: ninguna foto queda invisible por un evento perdido
+  setTimeout(function () { $$(".fade-img").forEach(function (i) { i.classList.add("is-loaded"); }); }, 5000);
   var waLink = function (text) {
     return "https://wa.me/" + C.contacto.whatsapp + (text ? "?text=" + encodeURIComponent(text) : "");
   };
@@ -60,7 +74,6 @@
   /* ---------------- Contenido general ---------------- */
   function initContent() {
     document.title = C.nombre + " — Reservá tu turno online";
-    if (C.modo === "salon") $('meta[name="theme-color"]').setAttribute("content", "#f8f3ee");
 
     var binds = {
       nombre: C.nombre,
@@ -77,7 +90,13 @@
     $("#year").textContent = new Date().getFullYear();
 
     // Hero
-    var hero = $("#heroImg"); hero.src = C.heroImagen; hero.alt = C.nombre;
+    var hero = $("#heroImg");
+    if (/images\.unsplash\.com/.test(C.heroImagen)) {
+      hero.srcset = [800, 1200, 1800, 2400].map(function (w) { return C.heroImagen.replace(/w=\d+/, "w=" + w) + " " + w + "w"; }).join(", ");
+      hero.sizes = "100vw";
+    }
+    hero.src = C.heroImagen; hero.alt = C.nombre;
+    hero.addEventListener("load", function () { hero.classList.add("is-loaded"); });
     hero.addEventListener("error", function () { hero.classList.add("is-broken"); });
     var words = C.eslogan.split(" ");
     $("#heroTitle").innerHTML = words.map(function (w, i) {
@@ -147,7 +166,7 @@
       return '<button class="gallery__item reveal" type="button" data-i="' + i + '" data-alt="' + esc(f.alt) + '">' +
         '<img src="' + esc(f.src) + '" alt="' + esc(f.alt) + '" loading="lazy"></button>';
     }).join("");
-    $$("img", g).forEach(fallbackImg);
+    $$("img", g).forEach(function (i) { fallbackImg(i); });
 
     var lb = $("#lightbox"), img = $("img", lb), cur = 0;
     function show(i) {
@@ -178,7 +197,7 @@
       return '<article class="member reveal"><div class="member__photo"><img src="' + esc(p.foto) + '" alt="' + esc(p.nombre) + '" loading="lazy"></div>' +
         "<h3>" + esc(p.nombre) + "</h3><p>" + esc(p.rol) + '</p><button type="button" data-pro="' + esc(p.id) + '">Reservar con ' + esc(p.nombre) + " →</button></article>";
     }).join("");
-    $$("img", t).forEach(fallbackImg);
+    $$("img", t).forEach(function (i) { fallbackImg(i, i.alt); });
     t.addEventListener("click", function (e) {
       var b = e.target.closest("[data-pro]"); if (!b) return;
       Booking.preferPro(b.getAttribute("data-pro"));
@@ -269,6 +288,7 @@
       "<li>" + ICON.phone + '<a href="' + esc(waLink()) + '" target="_blank" rel="noopener">' + esc(k.telefono) + "</a></li>" +
       "<li>" + ICON.mail + '<a href="mailto:' + esc(k.email) + '">' + esc(k.email) + "</a></li>" +
       "<li>" + ICON.ig + '<a href="https://instagram.com/' + esc(k.instagram) + '" target="_blank" rel="noopener">@' + esc(k.instagram) + "</a></li>";
+    $("#mapGo").href = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(k.mapaQuery || k.direccion);
     $("#mapFrame").src = "https://maps.google.com/maps?q=" + encodeURIComponent(k.mapaQuery || k.direccion) + "&z=15&output=embed";
 
     $("#footerCols").innerHTML =
@@ -279,6 +299,29 @@
   }
 
   /* Abierto / cerrado en vivo */
+  // "Abre hoy 15:00", "Abre mañana 10:00" o "Abre el lunes 10:00"
+  function proximaApertura(now) {
+    var m = now.getHours() * 60 + now.getMinutes();
+    for (var i = 0; i < 8; i++) {
+      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+      if (C.diasCerrados.indexOf(dateKey(d)) >= 0) continue;
+      var r = (C.horarios[d.getDay()] || []).filter(function (x) { return i > 0 || toMin(x[0]) > m; })[0];
+      if (r) return "Abre " + (i === 0 ? "hoy" : i === 1 ? "mañana" : "el " + DIAS[d.getDay()].toLowerCase()) + " " + r[0];
+    }
+    return "Reservá online 24/7";
+  }
+
+  /* Portada: próximo turno disponible (dato real, calculado de la agenda) */
+  function initNextSlot() {
+    var el = $("#nextSlot"); if (!el) return;
+    var n = Booking.nextAvailable();
+    if (!n) return;
+    var d = parseKey(n.date), hoy = dateKey(new Date()), man = dateKey(new Date(Date.now() + 86400000));
+    var dia = n.date === hoy ? "hoy" : n.date === man ? "mañana" : DIAS[d.getDay()].toLowerCase() + " " + d.getDate();
+    $("strong", el).textContent = dia + " a las " + n.time;
+    el.hidden = false;
+  }
+
   function initStatus() {
     var pill = $("#statusPill");
     function upd() {
@@ -286,10 +329,46 @@
       var r = (C.horarios[now.getDay()] || []).filter(function (x) { return m >= toMin(x[0]) && m < toMin(x[1]); })[0];
       var closedToday = C.diasCerrados.indexOf(dateKey(now)) >= 0;
       pill.hidden = false;
-      pill.classList.toggle("is-open", !!r && !closedToday);
-      $("span", pill).textContent = r && !closedToday ? "Abierto · cierra " + r[1] : "Cerrado ahora";
+      var open = !!r && !closedToday;
+      pill.classList.toggle("is-open", open);
+      $("span", pill).textContent = open ? "Abierto ahora · hasta " + r[1] : proximaApertura(now);
     }
     upd(); setInterval(upd, 60000);
+  }
+
+  /* Medios de pago */
+  function initPayments() {
+    var html = (C.mediosPago || []).map(function (m) { return "<li>" + esc(m) + "</li>"; }).join("");
+    $$(".pay-list").forEach(function (ul) { ul.innerHTML = html; });
+  }
+
+  /* Textos legales: privacidad y condiciones de reserva */
+  function initLegal() {
+    var dlg = $("#legal"); if (!dlg) return;
+    var cancel = (C.faq.filter(function (f) { return /cancel/i.test(f.p); })[0] || {}).r || "Podés cancelar o reprogramar escribiéndonos por WhatsApp con anticipación.";
+    var TXT = {
+      privacidad: { t: "Política de privacidad", b:
+        "<p>Los datos que ingresás al reservar (nombre, teléfono, email y notas) se usan únicamente para gestionar tu turno, enviarte recordatorios y comunicarnos con vos.</p>" +
+        "<p>No los vendemos ni compartimos con terceros. Podés pedir que los modifiquemos o eliminemos en cualquier momento escribiendo a " + esc(C.contacto.email) + ".</p>" +
+        "<p>Tratamos tus datos conforme a la Ley 25.326 de Protección de Datos Personales de la República Argentina.</p>" },
+      condiciones: { t: "Condiciones de reserva", b:
+        "<p><strong>Cancelaciones y cambios.</strong> " + esc(cancel) + "</p>" +
+        (C.sena && C.sena.activa ? "<p><strong>Seña.</strong> Para confirmar el turno se abona una seña del " + C.sena.porcentaje + "% del total. Si cancelás con la anticipación indicada, queda a favor para tu próximo turno. Si no te presentás, la seña no se reintegra.</p>" : "") +
+        "<p><strong>Puntualidad.</strong> Tenemos 10 minutos de tolerancia. Pasado ese tiempo, puede que debamos acortar el servicio o reprogramarlo.</p>" +
+        "<p><strong>Precios.</strong> Los precios publicados son finales y pueden actualizarse sin previo aviso. Se respeta el precio vigente al momento de reservar.</p>" }
+    };
+    function open(k) {
+      var x = TXT[k]; if (!x) return;
+      $("#legalTitle").textContent = x.t; $("#legalBody").innerHTML = x.b;
+      if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
+    }
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest("[data-legal]"); if (!a) return;
+      e.preventDefault(); open(a.getAttribute("data-legal"));
+    });
+    dlg.addEventListener("click", function (e) {
+      if (e.target === dlg || e.target.closest("[data-close-legal]")) { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
+    });
   }
 
   /* ---------------- Reservas ---------------- */
@@ -427,7 +506,7 @@
       grid.innerHTML = s.length ? s.map(function (x) {
         var h = toHHMM(x.t);
         return '<button type="button" class="slot' + (st.time === h ? " is-selected" : "") + '" data-time="' + h + '" data-pro="' + esc(x.pro) + '">' + h + "</button>";
-      }).join("") : '<p class="slots__empty">No quedan horarios este día.</p>';
+      }).join("") : '<div class="slots__empty">No quedan horarios este día.<a href="' + esc(waLink("¡Hola " + C.nombre + "! Quería un turno el " + fmtLargo(parseKey(st.date)) + ". Si se libera un lugar, ¿me avisan?")) + '" target="_blank" rel="noopener">Avisarme si se libera →</a></div>';
     }
     $("#calendar").addEventListener("click", function (e) {
       var nav = e.target.closest("[data-nav]");
@@ -603,6 +682,26 @@
     renderSvcs(); update(); renderMine();
 
     return {
+      nextAvailable: function () {
+        var svc = C.servicios.filter(function (s) { return s.destacado; })[0] || C.servicios[0];
+        if (!svc) return null;
+        var pros = C.equipo.filter(function (p) { return p.servicios === "todos" || p.servicios.indexOf(svc.id) >= 0; });
+        var now = new Date(), minStart = now.getHours() * 60 + now.getMinutes() + C.anticipacionMinima;
+        for (var i = 0; i <= Math.min(C.diasReservables, 14); i++) {
+          var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i), dk = dateKey(d);
+          if (C.diasCerrados.indexOf(dk) >= 0) continue;
+          var shifts = C.horarios[d.getDay()] || [];
+          for (var j = 0; j < shifts.length; j++) {
+            for (var t = toMin(shifts[j][0]); t + svc.duracion <= toMin(shifts[j][1]); t += C.intervaloTurnos) {
+              if (i === 0 && t < minStart) continue;
+              for (var k = 0; k < pros.length; k++) {
+                if (T.isProFree(pros[k].id, dk, t, svc.duracion)) return { date: dk, time: toHHMM(t) };
+              }
+            }
+          }
+        }
+        return null;
+      },
       preselectService: function (id) {
         if (st.step === 5) { st = { step: 1, svcs: [], pro: null, date: null, time: null, month: null }; }
         if (st.svcs.indexOf(id) < 0) st.svcs.push(id);
@@ -777,6 +876,9 @@
     safe(initFaq, "faq");
     safe(initHours, "hours");
     safe(initStatus, "status");
+    safe(initNextSlot, "nextslot");
+    safe(initPayments, "payments");
+    safe(initLegal, "legal");
     safe(initNav, "nav");
     safe(initReveal, "reveal");
     safe(initCounters, "counters");

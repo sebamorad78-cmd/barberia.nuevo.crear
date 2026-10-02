@@ -22,7 +22,7 @@
   // para que el local pueda contactarte. Dejá whatsapp vacío para ocultarlo.
   var VENDEDOR = {
     nombre: "Tu Estudio Web",
-    whatsapp: "5491100000000",
+    whatsapp: "5492230000000",
     mensaje: "¡Hola! Vi la demo de la web de turnos y me interesa para mi local.",
     email: "ventas@tuestudioweb.com",
     // Planes que ofrecés (se muestran en vender.html). Editá precios a gusto.
@@ -73,13 +73,20 @@
     // PIN del panel del dueño (admin.html). Es solo para la demo: para uso
     // real hay que conectar un servidor con usuarios y contraseñas.
     pinPanel: "1234",
+    ciudad: "Mar del Plata",
+    mediosPago: ["Efectivo", "Débito", "Crédito", "Transferencia", "Mercado Pago"],
+    // Preguntas que se suman a las de cada rubro
+    faqComun: [
+      { p: "¿Puedo reservar si estoy de vacaciones en Mar del Plata?", r: "¡Claro! Reservá online antes de llegar y asegurate tu lugar, sobre todo en temporada de verano y fines de semana largos." },
+      { p: "¿Hay estacionamiento cerca?", r: "Hay estacionamiento medido sobre la calle y playas de estacionamiento a pocos metros. Si venís caminando por la zona, estamos a una cuadra de la avenida." }
+    ],
     contacto: {
-      whatsapp: "5491100000000", // código de país + número, sin + ni espacios
-      telefono: "+54 9 11 0000-0000",
+      whatsapp: "5492230000000", // código de país + número, sin + ni espacios
+      telefono: "+54 9 223 000-0000",
       email: "hola@tunegocio.com",
       instagram: "tunegocio",
-      direccion: "Av. Siempreviva 742, Buenos Aires",
-      mapaQuery: "Obelisco, Buenos Aires"
+      direccion: "Güemes 2900, Mar del Plata",
+      mapaQuery: "Güemes 2900, Mar del Plata"
     }
   };
 
@@ -376,6 +383,7 @@
   cfg.mostrarSelectorDemo = MOSTRAR_SELECTOR_DEMO && q.limpio !== "1";
   cfg.esDemo = MOSTRAR_SELECTOR_DEMO;
   cfg.vendedor = VENDEDOR;
+  cfg.faq = (base.faq || []).concat(comunes.faqComun || []);
   cfg.params = q;
 
   window.__NEGOCIO__ = cfg;

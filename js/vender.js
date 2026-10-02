@@ -20,10 +20,10 @@
   $("#year").textContent = new Date().getFullYear();
 
   var ESTILOS = [
-    { modo: "barberia", nombre: "Barbería", ejemplo: "Barbería Imperio", colores: ["#0f0e0c", "#c8a35b", "#efe9df"], texto: "Oscuro, clásico y masculino." },
-    { modo: "salon", nombre: "Salón de belleza", ejemplo: "Maison Lumière", colores: ["#f8f3ee", "#a24d63", "#2b1d22"], texto: "Luminoso, elegante y femenino." },
-    { modo: "spa", nombre: "Spa & estética", ejemplo: "Salvia Spa", colores: ["#f2f3ee", "#5d7a64", "#1f2a24"], texto: "Sereno, natural y de bienestar." },
-    { modo: "unas", nombre: "Nail bar", ejemplo: "Nude Nail Bar", colores: ["#141113", "#e9a6b4", "#f6ece9"], texto: "Moderno, chic y con onda." }
+    { modo: "barberia", nombre: "Barbería", ejemplo: "Barbería Imperio", colores: ["#0e0d0b", "#c9a45c", "#f1ebe0"], texto: "Oscuro, clásico y masculino." },
+    { modo: "salon", nombre: "Salón de belleza", ejemplo: "Maison Lumière", colores: ["#faf6f1", "#9b4560", "#2a1b20"], texto: "Luminoso, elegante y femenino." },
+    { modo: "spa", nombre: "Spa & estética", ejemplo: "Salvia Spa", colores: ["#f1f2ec", "#4a6752", "#1d2822"], texto: "Sereno, natural y de bienestar." },
+    { modo: "unas", nombre: "Nail bar", ejemplo: "Nude Nail Bar", colores: ["#131012", "#eaa8b6", "#f7ede9"], texto: "Moderno, chic y con onda." }
   ];
 
   $("#heroPhone").src = "index.html?modo=barberia&limpio=1";
@@ -56,6 +56,19 @@
     p.set("limpio", "1");
     window.open("index.html?" + p.toString(), "_blank", "noopener");
   });
+
+  // Calculadora de turnos perdidos
+  var fmt = function (n) { return "$" + Math.round(n).toLocaleString("es-AR"); };
+  function calc() {
+    var a = +$("#cAus").value, p = +$("#cPrecio").value, l = +$("#cPerdidos").value;
+    $("#oAus").textContent = a; $("#oPrecio").textContent = fmt(p); $("#oPerdidos").textContent = l;
+    var mes = (a + l) * p * 4.3;
+    $("#cTotal").textContent = fmt(mes);
+    var plan = (V.planes || []).filter(function (x) { return x.destacado; })[0];
+    $("#cNota").textContent = "Recuperando solo la mitad, son " + fmt(mes / 2) + " por mes" + (plan ? " (el plan " + plan.nombre + " cuesta " + plan.precio + " " + plan.periodo + ")." : ".");
+  }
+  ["#cAus", "#cPrecio", "#cPerdidos"].forEach(function (id) { $(id).addEventListener("input", calc); });
+  calc();
 
   $("#plans").innerHTML = (V.planes || []).map(function (pl) {
     var msg = "¡Hola! Me interesa el plan " + pl.nombre + " para mi local.";
