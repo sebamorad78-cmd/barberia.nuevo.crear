@@ -25,8 +25,12 @@
   var parseKey = function (k) { var p = k.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
   var startOfDay = function (d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
   var DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+  var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  var fmtNum = function (n, dec) { return dec ? Number(n).toFixed(dec) : Math.round(n).toLocaleString("es-AR"); };
+  var cap1 = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); };
+  // "miércoles 7 de octubre" (para usar dentro de una frase)
   var fmtLargo = function (d) {
-    return d.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
+    return DIAS[d.getDay()].toLowerCase() + " " + d.getDate() + " de " + MESES[d.getMonth()];
   };
   var durTxt = function (m) {
     var h = Math.floor(m / 60), r = m % 60;
@@ -104,8 +108,8 @@
       return '<span class="w"><span style="animation-delay:' + (0.15 + i * 0.09).toFixed(2) + 's">' + inner + "</span></span>";
     }).join(" ");
     $("#heroStats").innerHTML = C.cifras.map(function (c) {
-      return '<li><strong data-count="' + c.valor + '" data-dec="' + (c.decimales || 0) + '" data-suf="' + esc(c.sufijo) + '">' +
-        c.valor + esc(c.sufijo) + "</strong><span>" + esc(c.texto) + "</span></li>";
+      return '<li><strong data-count="' + c.valor + '" data-dec="' + (c.decimales || 0) + '" data-pre="' + esc(c.prefijo || "") + '" data-suf="' + esc(c.sufijo) + '">' +
+        esc(c.prefijo || "") + fmtNum(c.valor, c.decimales || 0) + esc(c.sufijo) + "</strong><span>" + esc(c.texto) + "</span></li>";
     }).join("");
 
     // Marquee
@@ -401,7 +405,7 @@
         for (var t = toMin(r[0]); t + dur <= toMin(r[1]); t += C.intervaloTurnos) {
           if (t < minStart) continue;
           var free = pros.filter(function (p) { return isProFree(p.id, dk, t, dur); });
-          if (free.length) out.push({ t: t, pro: free[0].id });
+          out.push(free.length ? { t: t, pro: free[0].id } : { t: t, busy: true });
         }
       });
       return out;
@@ -412,7 +416,7 @@
       if (d < today || d > last) return false;
       if (!(C.horarios[d.getDay()] || []).length) return false;
       if (C.diasCerrados.indexOf(dateKey(d)) >= 0) return false;
-      return slotsFor(dateKey(d)).length > 0;
+      return slotsFor(dateKey(d)).some(function (x) { return !x.busy; });
     }
 
     /* Paso 1 */
@@ -455,7 +459,7 @@
       }
       html += pros.map(function (p) {
         return '<button type="button" class="opt pro' + (st.pro === p.id ? " is-selected" : "") + '" data-id="' + esc(p.id) + '">' +
-          '<span class="pro__avatar"><img src="' + esc(p.foto) + '" alt="" onerror="this.remove()"></span>' +
+          '<span class="pro__avatar">' + esc(p.nombre.charAt(0)) + '<img src="' + esc(p.foto) + '" alt="" onerror="this.remove()"></span>' +
           "<span><strong>" + esc(p.nombre) + "</strong><small>" + esc(p.rol) + "</small></span></button>";
       }).join("");
       $("#proPick").innerHTML = html;
@@ -479,7 +483,7 @@
       var canPrev = y > today.getFullYear() || mo > today.getMonth();
       var canNext = new Date(y, mo + 1, 1) <= last;
       var html = '<div class="cal__head"><button type="button" data-nav="-1" aria-label="Mes anterior"' + (canPrev ? "" : " disabled") + ">‹</button>" +
-        "<strong>" + first.toLocaleDateString("es-AR", { month: "long", year: "numeric" }) + "</strong>" +
+        "<strong>" + cap1(MESES[mo]) + " de " + y + "</strong>" +
         '<button type="button" data-nav="1" aria-label="Mes siguiente"' + (canNext ? "" : " disabled") + '>›</button></div><div class="cal__grid">' +
         ["Lu", "Ma", "Mi", "Ju", "Vi", "Sá", "Do"].map(function (d) { return '<span class="cal__dow">' + d + "</span>"; }).join("");
       for (var i = 0; i < offset; i++) html += "<span></span>";
@@ -501,12 +505,14 @@
     function renderSlots() {
       var label = $("#slotsLabel"), grid = $("#slots");
       if (!st.date) { label.textContent = "Elegí un día"; grid.innerHTML = '<p class="slots__empty">No hay días disponibles.</p>'; return; }
-      label.textContent = fmtLargo(parseKey(st.date));
-      var s = slotsFor(st.date);
+      label.textContent = cap1(fmtLargo(parseKey(st.date)));
+      var s = slotsFor(st.date), libres = s.filter(function (x) { return !x.busy; }).length;
+      var waitlist = '<div class="slots__empty">No quedan horarios este día.<a href="' + esc(waLink("¡Hola " + C.nombre + "! Quería un turno el " + fmtLargo(parseKey(st.date)) + ". Si se libera un lugar, ¿me avisan?")) + '" target="_blank" rel="noopener">Avisarme si se libera →</a></div>';
       grid.innerHTML = s.length ? s.map(function (x) {
         var h = toHHMM(x.t);
+        if (x.busy) return '<button type="button" class="slot is-busy" disabled aria-label="' + h + ' ocupado"><s>' + h + "</s><small>Ocupado</small></button>";
         return '<button type="button" class="slot' + (st.time === h ? " is-selected" : "") + '" data-time="' + h + '" data-pro="' + esc(x.pro) + '">' + h + "</button>";
-      }).join("") : '<div class="slots__empty">No quedan horarios este día.<a href="' + esc(waLink("¡Hola " + C.nombre + "! Quería un turno el " + fmtLargo(parseKey(st.date)) + ". Si se libera un lugar, ¿me avisan?")) + '" target="_blank" rel="noopener">Avisarme si se libera →</a></div>';
+      }).join("") + (libres ? "" : waitlist) : '<div class="slots__empty">No quedan horarios este día.<a href="' + esc(waLink("¡Hola " + C.nombre + "! Quería un turno el " + fmtLargo(parseKey(st.date)) + ". Si se libera un lugar, ¿me avisan?")) + '" target="_blank" rel="noopener">Avisarme si se libera →</a></div>';
     }
     $("#calendar").addEventListener("click", function (e) {
       var nav = e.target.closest("[data-nav]");
@@ -534,7 +540,7 @@
       var proName = st.pro === "any" ? "Cualquiera" : st.pro ? proById(st.pro).nombre : "—";
       if (st.pro === "any" && st.time && st.slotPro) proName = proById(st.slotPro).nombre;
       $("#sumPro").textContent = proName;
-      $("#sumDate").textContent = st.date ? fmtLargo(parseKey(st.date)).replace(/^\w/, function (c) { return c.toUpperCase(); }) + (st.time ? " · " + st.time : "") : "—";
+      $("#sumDate").textContent = st.date ? cap1(fmtLargo(parseKey(st.date))) + (st.time ? " · " + st.time : "") : "—";
       $("#sumDur").textContent = svcs.length ? durTxt(totalDur()) : "—";
       $("#sumTotal").textContent = money(totalPrice());
       var sn = senaDe(totalPrice()), sb = $("#sumSena");
@@ -566,8 +572,9 @@
         renderCalendar(); renderSlots();
       }
       update();
-      var top = box.getBoundingClientRect().top;
-      if (top < 0 || top > window.innerHeight * 0.6) window.scrollTo({ top: window.scrollY + top - 90, behavior: "smooth" });
+      // Que la barra de pasos quede visible debajo del header fijo (usa scroll-margin-top de .booking)
+      var top = box.getBoundingClientRect().top, navH = $("#nav").offsetHeight;
+      if (top < navH || top > window.innerHeight * 0.5) box.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     $("#nextBtn").addEventListener("click", function () {
@@ -665,7 +672,7 @@
       var box2 = $("#myBookings");
       box2.hidden = !mine.length;
       $("#myBookingsList").innerHTML = mine.map(function (b) {
-        return "<li><span><strong>" + esc(fmtLargo(parseKey(b.date))) + " · " + esc(b.time) + "</strong><br><span class=\"muted\">" +
+        return "<li><span><strong>" + esc(cap1(fmtLargo(parseKey(b.date)))) + " · " + esc(b.time) + "</strong><br><span class=\"muted\">" +
           esc(b.svcs.map(function (id) { var s = svcById(id); return s ? s.nombre : id; }).join(" + ")) + " con " + esc((proById(b.pro) || {}).nombre || "") +
           " · " + esc(b.code) + '</span></span><button type="button" data-cancel="' + esc(b.code) + '">Cancelar</button></li>';
       }).join("");
@@ -729,7 +736,16 @@
       nav.classList.toggle("is-scrolled", y > 30);
       var r = booking.getBoundingClientRect();
       var inBooking = r.top < window.innerHeight && r.bottom > 0;
-      mcta.classList.toggle("is-on", y > window.innerHeight * 0.7 && !inBooking);
+      var ctaOn = y > window.innerHeight * 0.7 && !inBooking;
+      mcta.classList.toggle("is-on", ctaOn);
+      document.body.classList.toggle("has-cta", ctaOn);
+    }
+    // WhatsApp flotante: se oculta mientras el usuario está reservando
+    var wa = $("#waFloat");
+    if (wa && "IntersectionObserver" in window) {
+      new IntersectionObserver(function (ents) {
+        ents.forEach(function (en) { wa.classList.toggle("is-hidden", en.isIntersecting); });
+      }, { threshold: 0, rootMargin: "-20% 0px -20% 0px" }).observe(booking);
     }
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
     burger.addEventListener("click", function () {
@@ -771,13 +787,13 @@
 
   function initCounters() {
     $$("[data-count]").forEach(function (el) {
-      var to = parseFloat(el.getAttribute("data-count")), dec = +el.getAttribute("data-dec"), suf = el.getAttribute("data-suf");
+      var to = parseFloat(el.getAttribute("data-count")), dec = +el.getAttribute("data-dec"), suf = el.getAttribute("data-suf"), pre = el.getAttribute("data-pre") || "";
       var t0 = null, dur = 1800;
       setTimeout(function () {
         function step(ts) {
           if (!t0) t0 = ts;
           var p = Math.min((ts - t0) / dur, 1), e = 1 - Math.pow(1 - p, 3);
-          el.textContent = (to * e).toFixed(dec) + suf;
+          el.textContent = pre + fmtNum(to * e, dec) + suf;
           if (p < 1) requestAnimationFrame(step);
         }
         requestAnimationFrame(step);

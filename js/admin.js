@@ -20,7 +20,9 @@
   var parseKey = function (k) { var p = k.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
   var addDays = function (d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; };
   var today = function () { var d = new Date(); d.setHours(0, 0, 0, 0); return d; };
-  var fmtDia = function (d) { return d.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" }); };
+  var DIAS_L = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  var MESES_L = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  var fmtDia = function (d) { return DIAS_L[d.getDay()] + " " + d.getDate() + " de " + MESES_L[d.getMonth()]; };
   var fmtCorto = function (k) { return parseKey(k).toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" }); };
   var cap = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); };
   var svcById = function (id) { return C.servicios.filter(function (s) { return s.id === id; })[0]; };

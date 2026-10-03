@@ -120,8 +120,8 @@
       "Trabajamos con productos seleccionados, herramientas esterilizadas en cada servicio y turnos con el tiempo justo para que nadie te apure."
     ],
     cifras: [
-      { valor: 14, sufijo: "", texto: "años de oficio" },
-      { valor: 25, sufijo: "k+", texto: "cortes realizados" },
+      { valor: 8, sufijo: "", texto: "años en el barrio" },
+      { valor: 2000, prefijo: "+", sufijo: "", texto: "clientes" },
       { valor: 4.9, sufijo: "★", texto: "en Google", decimales: 1 }
     ],
     servicios: [
@@ -184,7 +184,7 @@
     ],
     cifras: [
       { valor: 9, sufijo: "", texto: "años de trayectoria" },
-      { valor: 18, sufijo: "k+", texto: "clientas felices" },
+      { valor: 1800, prefijo: "+", sufijo: "", texto: "clientas" },
       { valor: 4.9, sufijo: "★", texto: "en Google", decimales: 1 }
     ],
     servicios: [
@@ -243,9 +243,9 @@
       "Cada tratamiento comienza con una evaluación personalizada. Trabajamos con aparatología habilitada y protocolos de bioseguridad."
     ],
     cifras: [
-      { valor: 7, sufijo: "", texto: "años de experiencia" },
-      { valor: 12, sufijo: "k+", texto: "sesiones realizadas" },
-      { valor: 5.0, sufijo: "★", texto: "en Google", decimales: 1 }
+      { valor: 6, sufijo: "", texto: "años de experiencia" },
+      { valor: 1200, prefijo: "+", sufijo: "", texto: "clientas" },
+      { valor: 4.9, sufijo: "★", texto: "en Google", decimales: 1 }
     ],
     servicios: [
       { id: "descontracturante", categoria: "Masajes", nombre: "Masaje descontracturante", descripcion: "Espalda, cuello y hombros.", duracion: 50, precio: 24000, destacado: true },
@@ -306,8 +306,8 @@
     ],
     cifras: [
       { valor: 5, sufijo: "", texto: "años creando sets" },
-      { valor: 30, sufijo: "k+", texto: "manos felices" },
-      { valor: 4.9, sufijo: "★", texto: "en Google", decimales: 1 }
+      { valor: 1500, prefijo: "+", sufijo: "", texto: "clientas" },
+      { valor: 4.8, sufijo: "★", texto: "en Google", decimales: 1 }
     ],
     servicios: [
       { id: "semi", categoria: "Manos", nombre: "Semipermanente", descripcion: "Esmaltado que dura hasta 21 días.", duracion: 60, precio: 14000, destacado: true },
