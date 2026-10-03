@@ -26,12 +26,12 @@
     { modo: "unas", nombre: "Nail bar", ejemplo: "Nude Nail Bar", colores: ["#131012", "#eaa8b6", "#f7ede9"], texto: "Moderno, chic y con onda." }
   ];
 
-  $("#heroPhone").src = "index.html?modo=barberia&limpio=1";
+  $("#heroPhone").src = "barberia/?limpio=1";
 
   $("#demoCards").innerHTML = ESTILOS.map(function (e) {
     return '<article class="democard"><div class="democard__sw">' + e.colores.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + "</div>" +
       "<h3>" + esc(e.nombre) + "</h3><p>" + esc(e.texto) + '</p><div class="democard__links">' +
-      '<a class="btn btn--primary btn--sm" href="index.html?modo=' + e.modo + '&limpio=1" target="_blank" rel="noopener">Ver web</a>' +
+      '<a class="btn btn--primary btn--sm" href="' + e.modo + '/?limpio=1" target="_blank" rel="noopener">Ver web</a>' +
       '<a class="btn btn--ghost btn--sm" href="admin.html?modo=' + e.modo + '" target="_blank" rel="noopener">Ver panel</a></div></article>';
   }).join("");
 
@@ -50,11 +50,10 @@
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();
     var p = new URLSearchParams();
-    p.set("modo", selected);
     p.set("nombre", form.elements.nombre.value.trim());
     if (colorTouched) p.set("color", form.elements.color.value.replace("#", ""));
     p.set("limpio", "1");
-    window.open("index.html?" + p.toString(), "_blank", "noopener");
+    window.open(selected + "/?" + p.toString(), "_blank", "noopener");
   });
 
   // Calculadora de turnos perdidos

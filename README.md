@@ -38,6 +38,21 @@ Todo está en **`js/config.js`**:
 ### Parámetros del link (opcional)
 `?modo=salon&nombre=Mi%20Local&eslogan=...&color=aa3355&wa=5491122334455&dir=...&ig=usuario&ajuste=15&sena=0&alias=mi.alias&limpio=1`
 
+## Vista previa en WhatsApp (una página por rubro)
+WhatsApp no ejecuta JavaScript: arma la tarjeta del link leyendo el HTML. Por eso cada rubro tiene su página con título, descripción e imagen propios:
+
+| Link | Tarjeta en WhatsApp |
+|---|---|
+| `/barberia/` | "Así se vería la web de tu barbería" + imagen dorada |
+| `/salon/` | "Así se vería la web de tu salón de belleza" + imagen marfil y baya |
+| `/spa/` | "Así se vería la web de tu spa o centro de estética" + imagen salvia |
+| `/unas/` | "Así se vería la web de tu nail bar" + imagen negro y nude |
+| `/vender.html` | "Webs con turnos online para tu local · Mar del Plata" |
+
+Las genera `tools/rubros.py` a partir de `index.html` (imágenes en `assets/og/`). **Si cambiás `index.html`, volvé a correrlo**:
+`python3 tools/rubros.py --url https://TU-SITIO.netlify.app` (agregá `--imagenes` para redibujar las imágenes; los textos se editan en el mismo script).
+Publicando desde GitHub, Netlify lo corre solo con la URL real (ver `netlify.toml`).
+
 ## Publicar
 Subí toda la carpeta a Netlify (app.netlify.com/drop), Hostinger, Vercel o GitHub Pages. Si cambiás CSS/JS, actualizá el `?v=...` en los `.html`.
 

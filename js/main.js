@@ -42,7 +42,11 @@
   var T = window.__TURNOS__;
   var store = { get: T.all, set: T.save };
   var senaDe = function (total) { return C.sena && C.sena.activa ? Math.round(total * C.sena.porcentaje / 100 / 100) * 100 : 0; };
-  var conParams = function (url) { return url + location.search; };
+  // Links a otras páginas conservando la personalización (y el rubro, que en /unas/ no va en la URL)
+  var conParams = function (url) {
+    var p = new URLSearchParams(location.search); p.set("modo", C.modo);
+    return C.root + url + "?" + p.toString();
+  };
   var toastTimer;
   var toast = function (msg) {
     var t = $("#toast"); t.textContent = msg; t.classList.add("is-on");
@@ -835,7 +839,7 @@
     form.elements.ajuste.value = P.ajuste || "";
     form.elements.sena.checked = P.sena !== "0";
     $("#demoAdmin").href = conParams("admin.html");
-    $("#demoVender").href = "vender.html";
+    $("#demoVender").href = C.root + "vender.html";
     form.elements.color.value = C.color || getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#c8a35b";
     var colorTouched = !!C.color;
     form.elements.color.addEventListener("input", function () { colorTouched = true; });
@@ -859,7 +863,6 @@
 
     function buildUrl(clean, keepOpen) {
       var p = new URLSearchParams();
-      p.set("modo", mode);
       if (!form.elements.sena.checked) p.set("sena", "0");
       ["nombre", "eslogan", "wa", "dir", "ig", "ajuste"].forEach(function (k) {
         var v = form.elements[k].value.trim(); if (v) p.set(k, v);
@@ -867,10 +870,12 @@
       if (colorTouched) p.set("color", form.elements.color.value.replace("#", ""));
       if (clean) p.set("limpio", "1");
       if (keepOpen) p.set("panel", "1");
-      return location.origin + location.pathname + "?" + p.toString();
+      // Cada rubro tiene su página (/barberia/, /unas/…) con su propia vista previa para WhatsApp
+      var qs = p.toString();
+      return new URL(C.root + mode + "/", location.href).href + (qs ? "?" + qs : "");
     }
     form.addEventListener("submit", function (e) { e.preventDefault(); location.href = buildUrl(false, true); });
-    $("#demoReset").addEventListener("click", function () { location.href = location.pathname + "?modo=" + mode + "&panel=1"; });
+    $("#demoReset").addEventListener("click", function () { location.href = new URL(C.root + mode + "/", location.href).href + "?panel=1"; });
     $("#demoCopy").addEventListener("click", function () {
       var url = buildUrl(true, false);
       var done = function () { toast("Link copiado. Mandáselo al local por WhatsApp."); };

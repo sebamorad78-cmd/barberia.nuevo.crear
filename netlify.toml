@@ -1,6 +1,9 @@
 # Configuración para Netlify (sitio estático, sin build)
 [build]
   publish = "."
+  # Genera /barberia/, /salon/, /spa/ y /unas/ con su vista previa para WhatsApp,
+  # usando la URL real del sitio (Netlify la pasa en la variable URL).
+  command = "python3 tools/rubros.py"
 
 # HTML siempre fresco; CSS/JS cacheados (se refrescan con ?v=FECHA)
 [[headers]]
@@ -30,3 +33,8 @@
   for = "/admin.html"
   [headers.values]
     X-Robots-Tag = "noindex"
+
+[[headers]]
+  for = "/assets/og/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

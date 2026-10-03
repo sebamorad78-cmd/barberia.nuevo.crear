@@ -356,6 +356,8 @@
   var q = {};
   try { new URLSearchParams(location.search).forEach(function (v, k) { q[k] = v.trim(); }); } catch (e) {}
   var MODOS = { barberia: barberia, salon: salon, spa: spa, unas: unas };
+  // Las páginas por rubro (/unas/, /spa/…) fijan su modo con window.__MODO__
+  if (MODOS[window.__MODO__]) MODO = window.__MODO__;
   if (MODOS[q.modo]) MODO = q.modo;
   if (!MODOS[MODO]) MODO = "barberia";
 
@@ -393,6 +395,14 @@
   cfg.vendedor = VENDEDOR;
   cfg.faq = (base.faq || []).concat(comunes.faqComun || []);
   cfg.params = q;
+  // Prefijo hasta la raíz del sitio ("" en la raíz, "../" en /unas/, etc.)
+  cfg.root = window.__ROOT__ || "";
+  // Fotos propias con ruta relativa ("assets/fotos/x.jpg") funcionan desde cualquier carpeta
+  var fix = function (src) { return /^(https?:|data:|\/)/.test(src || "") ? src : cfg.root + src; };
+  cfg.heroImagen = fix(cfg.heroImagen);
+  cfg.nosotrosImagen = fix(cfg.nosotrosImagen);
+  cfg.galeria = cfg.galeria.map(function (g) { return Object.assign({}, g, { src: fix(g.src) }); });
+  cfg.equipo = cfg.equipo.map(function (p) { return Object.assign({}, p, { foto: fix(p.foto) }); });
 
   window.__NEGOCIO__ = cfg;
 })();

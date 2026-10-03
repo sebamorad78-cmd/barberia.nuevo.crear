@@ -46,8 +46,11 @@
   $$("[data-bind=nombre]").forEach(function (el) { el.textContent = C.nombre; });
   document.title = "Panel · " + C.nombre;
   $("#logoMark").textContent = C.nombre.replace(/^(barber[ií]a|sal[oó]n|estudio|spa)\s+/i, "").charAt(0).toUpperCase();
-  $("#backLink").href = "index.html" + location.search;
-  $("#webLink").href = "index.html" + location.search;
+  // Volver a la página del rubro (/unas/, /spa/…) conservando la personalización
+  var webQs = new URLSearchParams(location.search); webQs.delete("modo");
+  var webUrl = C.modo + "/" + (webQs.toString() ? "?" + webQs.toString() : "");
+  $("#backLink").href = webUrl;
+  $("#webLink").href = webUrl;
   if (C.esDemo) {
     $("#pinHint").textContent = "Demo: el PIN es " + C.pinPanel;
     $("#demoBadge").hidden = false;
