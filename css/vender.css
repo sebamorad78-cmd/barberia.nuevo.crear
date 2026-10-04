@@ -65,6 +65,15 @@
 .plans--single .plan { display: grid; grid-template-columns: 1fr 1.15fr; gap: 40px; padding: 44px; align-items: center; transform: none; }
 .plan__side { display: grid; gap: 16px; align-content: start; }
 .plans--single .plan__price strong { font-size: clamp(3rem, 6vw, 4.4rem); }
+.plan__side { min-width: 0; }
+.plan__side .btn { white-space: normal; text-align: center; }
+.plan__offer { justify-self: start; display: inline-block; padding: 6px 14px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.plan__usd { margin: -6px 0 0; font-size: 13px; color: var(--muted); }
+.plan__roi { margin: 0; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--accent) 12%, transparent); font-size: 14px; }
+.plan__roi strong { color: var(--accent); }
+.plan__extras { list-style: none; margin: 4px 0 0 !important; padding: 0 !important; border: 0 !important; display: grid; gap: 6px !important; font-size: 13px !important; color: var(--muted); }
+.plan__extras li { padding-left: 20px !important; }
+.plan__extras li::before { content: "✓"; color: var(--accent); }
 .plan__sum { margin: 0; color: var(--muted); font-size: 15.5px; }
 .plans--single .plan ul { margin: 0; padding-left: 40px; border-left: 1px solid var(--line); }
 @media (max-width: 820px) {

@@ -58,13 +58,19 @@
 
   // Calculadora de turnos perdidos
   var fmt = function (n) { return "$" + Math.round(n).toLocaleString("es-AR"); };
+  // Precio del abono en pesos (redondeado a $1.000) a partir de US$ y la cotización de config.js
+  var abono = Math.round((V.precioUSD || 0) * (V.cotizacion || 0) / 1000) * 1000;
+  var abonoTxt = fmt(abono);
+  $$('[data-v="precio"]').forEach(function (e) { e.textContent = abonoTxt; });
+  $$('[data-v="precio-usd"]').forEach(function (e) { e.textContent = "US$ " + V.precioUSD; });
   function calc() {
     var a = +$("#cAus").value, p = +$("#cPrecio").value, l = +$("#cPerdidos").value;
     $("#oAus").textContent = a; $("#oPrecio").textContent = fmt(p); $("#oPerdidos").textContent = l;
     var mes = (a + l) * p * 4.3;
     $("#cTotal").textContent = fmt(mes);
-    var plan = (V.planes || []).filter(function (x) { return x.destacado; })[0];
-    $("#cNota").textContent = "Recuperando solo la mitad, son " + fmt(mes / 2) + " por mes" + (plan ? ". El abono mensual es de " + plan.precio + "." : ".");
+    var turnos = Math.ceil(abono / p);
+    $("#cNota").textContent = "Recuperando solo la mitad, son " + fmt(mes / 2) + " por mes. El abono es de " + abonoTxt +
+      ": se paga con " + turnos + " turno" + (turnos === 1 ? "" : "s") + " recuperado" + (turnos === 1 ? "" : "s") + " al mes.";
   }
   ["#cAus", "#cPrecio", "#cPerdidos"].forEach(function (id) { $(id).addEventListener("input", calc); });
   calc();
@@ -72,14 +78,25 @@
   var planes = V.planes || [];
   $("#plans").classList.toggle("plans--single", planes.length === 1);
   $("#plans").innerHTML = planes.map(function (pl) {
-    var msg = "¡Hola Sebastian! Me interesa el plan " + pl.nombre + " para mi local.";
+    var msg = "¡Hola Sebastian! Quiero la web con turnos para mi local" + (V.primerMesGratis ? " (con el primer mes sin cargo)." : ".");
     var single = planes.length === 1;
+    var turnosRef = V.precioReferenciaServicio ? Math.ceil(abono / V.precioReferenciaServicio) : 0;
+    var anual = V.mesesRegaloAnual ? abono * (12 - V.mesesRegaloAnual) : 0;
+    var extras = [];
+    if (V.instalacionGratis) extras.push("Instalación sin costo");
+    extras.push("Sin permanencia: das de baja cuando quieras");
+    if (anual) extras.push("Pagando el año: " + V.mesesRegaloAnual + " meses de regalo (" + fmt(anual) + " por 12 meses)");
     var items = pl.incluye.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("");
     return '<article class="plan' + (pl.destacado ? " plan--feat" : "") + '">' + (pl.destacado && !single ? '<span class="plan__badge">Más elegido</span>' : "") +
       (single ? '<div class="plan__side">' : "") +
-      "<h3>" + esc(pl.nombre) + '</h3><p class="plan__price"><strong>' + esc(pl.precio) + "</strong><span>" + esc(pl.periodo) + "</span></p>" +
+      "<h3>" + esc(pl.nombre) + "</h3>" +
+      (V.primerMesGratis ? '<span class="plan__offer">Primer mes sin cargo</span>' : "") +
+      '<p class="plan__price"><strong>' + abonoTxt + "</strong><span>" + esc(pl.periodo) + "</span></p>" +
+      '<p class="plan__usd">US$ ' + esc(V.precioUSD) + " al " + esc(V.cotizacionFuente) + ". Se ajusta al tipo de cambio del día de pago.</p>" +
+      (turnosRef ? '<p class="plan__roi">Se paga con <strong>' + turnosRef + " turnos al mes</strong> (con un servicio de " + fmt(V.precioReferenciaServicio) + ").</p>" : "") +
       (pl.resumen ? '<p class="plan__sum">' + esc(pl.resumen) + "</p>" : "") +
-      (single ? '<a class="btn btn--primary btn--lg" target="_blank" rel="noopener" href="' + esc(wa(msg)) + '">Quiero mi web</a></div>' : "") +
+      (single ? '<a class="btn btn--primary btn--lg" target="_blank" rel="noopener" href="' + esc(wa(msg)) + '">' + (V.primerMesGratis ? "Quiero mi primer mes sin cargo" : "Quiero mi web") + "</a>" +
+        '<ul class="plan__extras">' + extras.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" : "") +
       "<ul>" + items + "</ul>" +
       (single ? "" : '<a class="btn ' + (pl.destacado ? "btn--primary" : "btn--ghost") + '" target="_blank" rel="noopener" href="' + esc(wa(msg)) + '">Quiero este plan</a>') +
       "</article>";

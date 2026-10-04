@@ -25,15 +25,27 @@
     whatsapp: "5492268516801",
     mensaje: "¡Hola Sebastian! Vi la demo de la web de turnos y me interesa para mi local.",
     email: "sebamorad46@gmail.com",
-    // Plan único (se muestra en vender.html). Editá precio o lo que incluye.
+    // PRECIO del abono: se muestra en pesos al dólar oficial, con el valor en dólares al lado.
+    // Actualizá "cotizacion" cada tanto (dólar oficial venta, Banco Nación).
+    precioUSD: 90,
+    cotizacion: 1540,
+    cotizacionFuente: "dólar oficial Banco Nación",
+    // Ofertas de entrada (bajan la barrera para que el local diga que sí). Poné false para ocultarlas.
+    primerMesGratis: true,
+    instalacionGratis: true,
+    mesesRegaloAnual: 2,          // pagando 12 meses juntos, estos meses van de regalo (0 = sin oferta anual)
+    precioReferenciaServicio: 15000, // corte promedio, para decir "se paga con N turnos"
+    // Plan único (se muestra en vender.html). Editá lo que incluye.
     planes: [
-      { nombre: "Todo incluido", precio: "US$ 90", periodo: "por mes", destacado: true,
+      { nombre: "Todo incluido", periodo: "por mes", destacado: true,
         resumen: "Tu web con turnos online y todo el mantenimiento a cargo mío. Vos te ocupás de atender.",
         incluye: [
           "Web profesional con tu nombre, colores y fotos",
           "Reservas online 24/7 con cobro de seña",
           "Panel del dueño: agenda, clientes y estadísticas",
           "Recordatorios y mensajes por WhatsApp",
+          "Botón de reservas en tu Instagram y Google Maps",
+          "Código QR de reservas para tu mostrador y vidriera",
           "Cambios de horarios, feriados y vacaciones",
           "Altas, bajas y cambios de personal",
           "Actualización de servicios, precios, promos y fotos",
@@ -42,7 +54,7 @@
           "Atención en persona en Mar del Plata"
         ] }
     ],
-    notaPlanes: "Sin permanencia mínima. Dominio propio (.com.ar) con costo aparte, según disponibilidad."
+    notaPlanes: "Dominio propio (.com.ar) opcional, con costo aparte según disponibilidad."
   };
 
   var u = function (id, w) {
@@ -103,8 +115,8 @@
     tipo: "Barbería",
     schemaTipo: "BarberShop",
     promos: [
-      { etiqueta: "Membresía", titulo: "Club Imperio", texto: "2 cortes + 2 perfilados de barba por mes, con prioridad de agenda.", precio: "$32.000 / mes" },
-      { etiqueta: "Regalo", titulo: "Gift card", texto: "Regalá un Ritual Imperio. Llega por WhatsApp con un diseño listo para mandar.", precio: "Desde $12.000" },
+      { etiqueta: "Membresía", titulo: "Club Imperio", texto: "2 cortes + 2 perfilados de barba por mes ($50.000 por separado), con prioridad de agenda.", precio: "$40.000 / mes" },
+      { etiqueta: "Regalo", titulo: "Gift card", texto: "Regalá un corte o un Ritual Imperio. Llega por WhatsApp con un diseño listo para mandar.", precio: "Desde $15.000" },
       { etiqueta: "Martes y miércoles", titulo: "15% off antes de las 13 h", texto: "Aplicado automáticamente al pagar en el local.", precio: "Todas las semanas" }
     ],
     nombre: "Barbería Imperio",
@@ -125,15 +137,15 @@
       { valor: 4.9, sufijo: "★", texto: "en Google", decimales: 1 }
     ],
     servicios: [
-      { id: "corte", categoria: "Cortes", nombre: "Corte clásico", descripcion: "Tijera y máquina, lavado y peinado.", duracion: 40, precio: 12000, destacado: true },
-      { id: "fade", categoria: "Cortes", nombre: "Fade / Degradé", descripcion: "Degradé a navaja con terminación prolija.", duracion: 45, precio: 14000 },
-      { id: "nino", categoria: "Cortes", nombre: "Corte niño", descripcion: "Hasta 12 años.", duracion: 30, precio: 9000 },
-      { id: "barba", categoria: "Barba", nombre: "Perfilado de barba", descripcion: "Diseño, rebaje y aceite hidratante.", duracion: 30, precio: 8000 },
-      { id: "afeitado", categoria: "Barba", nombre: "Afeitado tradicional", descripcion: "Toalla caliente, navaja y bálsamo.", duracion: 40, precio: 11000 },
-      { id: "combo", categoria: "Combos", nombre: "Corte + Barba", descripcion: "El combo de la casa.", duracion: 70, precio: 18000, destacado: true },
-      { id: "ritual", categoria: "Combos", nombre: "Ritual Imperio", descripcion: "Corte, afeitado, limpieza facial y bebida.", duracion: 100, precio: 26000 },
-      { id: "color", categoria: "Extras", nombre: "Color / Canas", descripcion: "Camuflaje de canas o color fantasía.", duracion: 60, precio: 16000 },
-      { id: "cejas", categoria: "Extras", nombre: "Cejas", descripcion: "Perfilado con navaja o hilo.", duracion: 15, precio: 4000 }
+      { id: "corte", categoria: "Cortes", nombre: "Corte clásico", descripcion: "Tijera y máquina, lavado y peinado.", duracion: 40, precio: 15000, destacado: true },
+      { id: "fade", categoria: "Cortes", nombre: "Fade / Degradé", descripcion: "Degradé a navaja con terminación prolija.", duracion: 45, precio: 17500 },
+      { id: "nino", categoria: "Cortes", nombre: "Corte niño", descripcion: "Hasta 12 años.", duracion: 30, precio: 11000 },
+      { id: "barba", categoria: "Barba", nombre: "Perfilado de barba", descripcion: "Diseño, rebaje y aceite hidratante.", duracion: 30, precio: 10000 },
+      { id: "afeitado", categoria: "Barba", nombre: "Afeitado tradicional", descripcion: "Toalla caliente, navaja y bálsamo.", duracion: 40, precio: 14000 },
+      { id: "combo", categoria: "Combos", nombre: "Corte + Barba", descripcion: "El combo de la casa.", duracion: 70, precio: 22500, destacado: true },
+      { id: "ritual", categoria: "Combos", nombre: "Ritual Imperio", descripcion: "Corte, afeitado, limpieza facial y bebida.", duracion: 100, precio: 32500 },
+      { id: "color", categoria: "Extras", nombre: "Color / Canas", descripcion: "Camuflaje de canas o color fantasía.", duracion: 60, precio: 20000 },
+      { id: "cejas", categoria: "Extras", nombre: "Cejas", descripcion: "Perfilado con navaja o hilo.", duracion: 15, precio: 5000 }
     ],
     equipo: [
       { id: "martin", nombre: "Martín", rol: "Fundador · Clásicos y navaja", foto: u("photo-1507003211169-0a1dd7228f2d", 700), servicios: "todos" },
@@ -188,17 +200,17 @@
       { valor: 4.9, sufijo: "★", texto: "en Google", decimales: 1 }
     ],
     servicios: [
-      { id: "corte", categoria: "Cabello", nombre: "Corte y brushing", descripcion: "Diagnóstico, lavado, corte y secado.", duracion: 60, precio: 22000, destacado: true },
-      { id: "brushing", categoria: "Cabello", nombre: "Brushing", descripcion: "Lavado y secado con forma.", duracion: 40, precio: 12000 },
-      { id: "peinado", categoria: "Cabello", nombre: "Peinado de evento", descripcion: "Recogidos, ondas y semirecogidos.", duracion: 60, precio: 28000 },
-      { id: "color", categoria: "Color", nombre: "Color global", descripcion: "Tintura completa + matizador.", duracion: 120, precio: 38000 },
-      { id: "balayage", categoria: "Color", nombre: "Balayage", descripcion: "Iluminación a mano alzada.", duracion: 180, precio: 65000, destacado: true },
-      { id: "nutricion", categoria: "Tratamientos", nombre: "Nutrición profunda", descripcion: "Hidratación intensiva con ampolla.", duracion: 45, precio: 18000 },
-      { id: "alisado", categoria: "Tratamientos", nombre: "Alisado / Keratina", descripcion: "Libre de formol.", duracion: 150, precio: 55000 },
-      { id: "manicura", categoria: "Uñas", nombre: "Manicura semipermanente", descripcion: "Esmaltado que dura hasta 3 semanas.", duracion: 60, precio: 15000 },
-      { id: "esculpidas", categoria: "Uñas", nombre: "Uñas esculpidas", descripcion: "Gel o acrílico, diseño simple.", duracion: 90, precio: 24000 },
-      { id: "cejas", categoria: "Rostro", nombre: "Perfilado de cejas", descripcion: "Diseño con pinza o hilo.", duracion: 20, precio: 7000 },
-      { id: "lifting", categoria: "Rostro", nombre: "Lifting de pestañas", descripcion: "Curvatura y tinte.", duracion: 60, precio: 20000 }
+      { id: "corte", categoria: "Cabello", nombre: "Corte y brushing", descripcion: "Diagnóstico, lavado, corte y secado.", duracion: 60, precio: 27500, destacado: true },
+      { id: "brushing", categoria: "Cabello", nombre: "Brushing", descripcion: "Lavado y secado con forma.", duracion: 40, precio: 15000 },
+      { id: "peinado", categoria: "Cabello", nombre: "Peinado de evento", descripcion: "Recogidos, ondas y semirecogidos.", duracion: 60, precio: 35000 },
+      { id: "color", categoria: "Color", nombre: "Color global", descripcion: "Tintura completa + matizador.", duracion: 120, precio: 47500 },
+      { id: "balayage", categoria: "Color", nombre: "Balayage", descripcion: "Iluminación a mano alzada.", duracion: 180, precio: 81000, destacado: true },
+      { id: "nutricion", categoria: "Tratamientos", nombre: "Nutrición profunda", descripcion: "Hidratación intensiva con ampolla.", duracion: 45, precio: 22500 },
+      { id: "alisado", categoria: "Tratamientos", nombre: "Alisado / Keratina", descripcion: "Libre de formol.", duracion: 150, precio: 69000 },
+      { id: "manicura", categoria: "Uñas", nombre: "Manicura semipermanente", descripcion: "Esmaltado que dura hasta 3 semanas.", duracion: 60, precio: 19000 },
+      { id: "esculpidas", categoria: "Uñas", nombre: "Uñas esculpidas", descripcion: "Gel o acrílico, diseño simple.", duracion: 90, precio: 30000 },
+      { id: "cejas", categoria: "Rostro", nombre: "Perfilado de cejas", descripcion: "Diseño con pinza o hilo.", duracion: 20, precio: 9000 },
+      { id: "lifting", categoria: "Rostro", nombre: "Lifting de pestañas", descripcion: "Curvatura y tinte.", duracion: 60, precio: 25000 }
     ],
     equipo: [
       { id: "sofia", nombre: "Sofía", rol: "Directora · Color y balayage", foto: u("photo-1494790108377-be9c29b29330", 700), servicios: ["corte", "brushing", "color", "balayage", "nutricion", "alisado", "peinado"] },
@@ -248,15 +260,15 @@
       { valor: 4.9, sufijo: "★", texto: "en Google", decimales: 1 }
     ],
     servicios: [
-      { id: "descontracturante", categoria: "Masajes", nombre: "Masaje descontracturante", descripcion: "Espalda, cuello y hombros.", duracion: 50, precio: 24000, destacado: true },
-      { id: "relajante", categoria: "Masajes", nombre: "Masaje relajante", descripcion: "Cuerpo completo con aceites esenciales.", duracion: 60, precio: 26000 },
-      { id: "piedras", categoria: "Masajes", nombre: "Piedras calientes", descripcion: "Basalto volcánico y aromaterapia.", duracion: 75, precio: 32000 },
-      { id: "limpieza", categoria: "Facial", nombre: "Limpieza facial profunda", descripcion: "Extracción, máscara y alta frecuencia.", duracion: 60, precio: 22000, destacado: true },
-      { id: "dermaplaning", categoria: "Facial", nombre: "Dermaplaning", descripcion: "Exfoliación y luminosidad inmediata.", duracion: 45, precio: 20000 },
-      { id: "peeling", categoria: "Facial", nombre: "Peeling químico", descripcion: "Manchas, textura y poros.", duracion: 40, precio: 28000 },
-      { id: "drenaje", categoria: "Corporal", nombre: "Drenaje linfático", descripcion: "Técnica manual Vodder.", duracion: 60, precio: 25000 },
-      { id: "madero", categoria: "Corporal", nombre: "Maderoterapia", descripcion: "Modelado y reducción de medidas.", duracion: 50, precio: 23000 },
-      { id: "dayspa", categoria: "Experiencias", nombre: "Day spa", descripcion: "Masaje + facial + infusión. Para regalar.", duracion: 150, precio: 58000 }
+      { id: "descontracturante", categoria: "Masajes", nombre: "Masaje descontracturante", descripcion: "Espalda, cuello y hombros.", duracion: 50, precio: 30000, destacado: true },
+      { id: "relajante", categoria: "Masajes", nombre: "Masaje relajante", descripcion: "Cuerpo completo con aceites esenciales.", duracion: 60, precio: 32500 },
+      { id: "piedras", categoria: "Masajes", nombre: "Piedras calientes", descripcion: "Basalto volcánico y aromaterapia.", duracion: 75, precio: 40000 },
+      { id: "limpieza", categoria: "Facial", nombre: "Limpieza facial profunda", descripcion: "Extracción, máscara y alta frecuencia.", duracion: 60, precio: 27500, destacado: true },
+      { id: "dermaplaning", categoria: "Facial", nombre: "Dermaplaning", descripcion: "Exfoliación y luminosidad inmediata.", duracion: 45, precio: 25000 },
+      { id: "peeling", categoria: "Facial", nombre: "Peeling químico", descripcion: "Manchas, textura y poros.", duracion: 40, precio: 35000 },
+      { id: "drenaje", categoria: "Corporal", nombre: "Drenaje linfático", descripcion: "Técnica manual Vodder.", duracion: 60, precio: 31000 },
+      { id: "madero", categoria: "Corporal", nombre: "Maderoterapia", descripcion: "Modelado y reducción de medidas.", duracion: 50, precio: 29000 },
+      { id: "dayspa", categoria: "Experiencias", nombre: "Day spa", descripcion: "Masaje + facial + infusión. Para regalar.", duracion: 150, precio: 55000 }
     ],
     equipo: [
       { id: "ines", nombre: "Inés", rol: "Cosmiatra · Faciales", foto: u("photo-1438761681033-6461ffad8d80", 700), servicios: ["limpieza", "dermaplaning", "peeling", "dayspa"] },
@@ -283,8 +295,8 @@
       { p: "¿Tienen gift cards?", r: "Sí, de cualquier servicio o monto. Se envían por WhatsApp o impresas." }
     ],
     promos: [
-      { etiqueta: "Pack", titulo: "4 sesiones corporales", texto: "Maderoterapia o drenaje: llevá 4 y pagá 3. Válido por 60 días.", precio: "$69.000" },
-      { etiqueta: "Regalo", titulo: "Gift card Day Spa", texto: "La experiencia completa, lista para regalar con tarjeta digital.", precio: "$58.000" },
+      { etiqueta: "Pack", titulo: "4 sesiones corporales", texto: "Maderoterapia o drenaje: llevá 4 y pagá 3. Válido por 60 días.", precio: "Desde $87.000" },
+      { etiqueta: "Regalo", titulo: "Gift card Day Spa", texto: "La experiencia completa, lista para regalar con tarjeta digital.", precio: "$55.000" },
       { etiqueta: "De a dos", titulo: "Masaje en pareja", texto: "Sala doble, misma hora, con espumante de cortesía.", precio: "20% off" }
     ]
   };
@@ -310,14 +322,14 @@
       { valor: 4.8, sufijo: "★", texto: "en Google", decimales: 1 }
     ],
     servicios: [
-      { id: "semi", categoria: "Manos", nombre: "Semipermanente", descripcion: "Esmaltado que dura hasta 21 días.", duracion: 60, precio: 14000, destacado: true },
-      { id: "kapping", categoria: "Manos", nombre: "Kapping gel", descripcion: "Refuerzo sobre uña natural.", duracion: 75, precio: 17000 },
-      { id: "esculpidas", categoria: "Manos", nombre: "Esculpidas en gel", descripcion: "Largo y forma a elección.", duracion: 120, precio: 26000, destacado: true },
-      { id: "service", categoria: "Manos", nombre: "Service de esculpidas", descripcion: "Relleno y nuevo esmaltado.", duracion: 90, precio: 20000 },
-      { id: "nailart", categoria: "Diseño", nombre: "Nail art", descripcion: "Diseño a mano alzada (por set).", duracion: 30, precio: 6000 },
-      { id: "retiro", categoria: "Diseño", nombre: "Retiro", descripcion: "Retiro cuidadoso + hidratación.", duracion: 20, precio: 4000 },
-      { id: "pedi", categoria: "Pies", nombre: "Pedicura spa", descripcion: "Exfoliación, cutículas y semipermanente.", duracion: 75, precio: 19000 },
-      { id: "combo", categoria: "Combos", nombre: "Manos + pies", descripcion: "Semipermanente en manos y pies.", duracion: 120, precio: 30000 }
+      { id: "semi", categoria: "Manos", nombre: "Semipermanente", descripcion: "Esmaltado que dura hasta 21 días.", duracion: 60, precio: 17500, destacado: true },
+      { id: "kapping", categoria: "Manos", nombre: "Kapping gel", descripcion: "Refuerzo sobre uña natural.", duracion: 75, precio: 21000 },
+      { id: "esculpidas", categoria: "Manos", nombre: "Esculpidas en gel", descripcion: "Largo y forma a elección.", duracion: 120, precio: 32500, destacado: true },
+      { id: "service", categoria: "Manos", nombre: "Service de esculpidas", descripcion: "Relleno y nuevo esmaltado.", duracion: 90, precio: 25000 },
+      { id: "nailart", categoria: "Diseño", nombre: "Nail art", descripcion: "Diseño a mano alzada (por set).", duracion: 30, precio: 7500 },
+      { id: "retiro", categoria: "Diseño", nombre: "Retiro", descripcion: "Retiro cuidadoso + hidratación.", duracion: 20, precio: 5000 },
+      { id: "pedi", categoria: "Pies", nombre: "Pedicura spa", descripcion: "Exfoliación, cutículas y semipermanente.", duracion: 75, precio: 24000 },
+      { id: "combo", categoria: "Combos", nombre: "Manos + pies", descripcion: "Semipermanente en manos y pies.", duracion: 120, precio: 37500 }
     ],
     equipo: [
       { id: "abril", nombre: "Abril", rol: "Fundadora · Esculpidas", foto: u("photo-1517841905240-472988babdf9", 700), servicios: "todos" },
@@ -345,7 +357,7 @@
     ],
     promos: [
       { etiqueta: "Fidelidad", titulo: "Tu 6° service, gratis", texto: "Sumá sellos digitales en cada visita y canjealos cuando quieras.", precio: "Club Nude" },
-      { etiqueta: "Regalo", titulo: "Gift card", texto: "Regalá un set completo o elegí el monto. Llega por WhatsApp.", precio: "Desde $14.000" },
+      { etiqueta: "Regalo", titulo: "Gift card", texto: "Regalá un set completo o elegí el monto. Llega por WhatsApp.", precio: "Desde $17.500" },
       { etiqueta: "Amigas", titulo: "Vení con una amiga", texto: "Reservando dos turnos a la misma hora, 15% off para las dos.", precio: "15% off" }
     ]
   };
