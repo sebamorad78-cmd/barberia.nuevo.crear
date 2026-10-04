@@ -27,7 +27,7 @@
     email: "sebamorad46@gmail.com",
     // Plan único (se muestra en vender.html). Editá precio o lo que incluye.
     planes: [
-      { nombre: "Todo incluido", precio: "US$ 180", periodo: "por mes", destacado: true,
+      { nombre: "Todo incluido", precio: "US$ 90", periodo: "por mes", destacado: true,
         resumen: "Tu web con turnos online y todo el mantenimiento a cargo mío. Vos te ocupás de atender.",
         incluye: [
           "Web profesional con tu nombre, colores y fotos",
