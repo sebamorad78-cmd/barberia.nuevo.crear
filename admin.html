@@ -8,12 +8,12 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c8a35b'/%3E%3Crect x='16' y='18' width='32' height='30' rx='4' fill='none' stroke='%230f0e0c' stroke-width='4'/%3E%3Cpath d='M16 28h32M26 14v8M38 14v8' stroke='%230f0e0c' stroke-width='4'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="css/styles.css?v=2026100701">
-  <link rel="stylesheet" href="css/admin.css?v=2026100701">
-  <script src="js/config.js?v=2026100701"></script>
-  <script src="js/store.js?v=2026100701"></script>
-  <script src="js/theme.js?v=2026100701"></script>
-  <script src="js/admin.js?v=2026100701" defer></script>
+  <link rel="stylesheet" href="css/styles.css?v=2026100801">
+  <link rel="stylesheet" href="css/admin.css?v=2026100801">
+  <script src="js/config.js?v=2026100801"></script>
+  <script src="js/store.js?v=2026100801"></script>
+  <script src="js/theme.js?v=2026100801"></script>
+  <script src="js/admin.js?v=2026100801" defer></script>
 </head>
 <body class="admin">
 
@@ -22,7 +22,9 @@
     <form class="login__card" id="loginForm">
       <p class="eyebrow"><span class="line"></span>Panel del local</p>
       <h1 class="login__title" data-bind="nombre">Tu negocio</h1>
-      <label class="field"><span>PIN de acceso</span><input name="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••" required></label>
+      <label class="field" id="pinField"><span>PIN de acceso</span><input name="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••"></label>
+      <label class="field" id="emailField" hidden><span>Email</span><input name="email" type="email" autocomplete="username" placeholder="tu@email.com"></label>
+      <label class="field" id="passField" hidden><span>Contraseña</span><input name="password" type="password" autocomplete="current-password" placeholder="••••••••"></label>
       <button class="btn btn--primary" type="submit">Entrar</button>
       <p class="login__hint" id="pinHint"></p>
       <a class="login__back" id="backLink" href="index.html">← Volver a la web</a>

@@ -57,24 +57,45 @@
   } else {
     $("#resetDemo").hidden = true;
   }
+  // Reservas reales: se entra con el email y la contraseña del dueño (Supabase)
+  if (T.remoto) {
+    $("#pinField").hidden = true; $("#emailField").hidden = false; $("#passField").hidden = false;
+  }
 
   function enter() {
     $("#login").hidden = true; $("#app").hidden = false;
-    try { sessionStorage.setItem("panel-ok", "1"); } catch (e) {}
     render();
+  }
+  function cargarYEntrar() {
+    return T.load().then(enter);
   }
   $("#loginForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    if (this.elements.pin.value === String(C.pinPanel)) enter();
-    else { toast("PIN incorrecto."); this.elements.pin.value = ""; }
+    var f = this, btn = $("button[type=submit]", f);
+    btn.disabled = true;
+    var p = T.remoto ? T.login(f.elements.email.value.trim(), f.elements.password.value) : T.login(f.elements.pin.value);
+    p.then(cargarYEntrar).catch(function (err) {
+      toast(err.message || "No pudimos entrar.");
+      if (T.remoto && err.codigo === "PERMISO") T.logout();
+      f.elements.pin.value = ""; f.elements.password.value = "";
+    }).then(function () { btn.disabled = false; });
   });
   $("#logout").addEventListener("click", function () {
-    try { sessionStorage.removeItem("panel-ok"); } catch (e) {}
-    location.reload();
+    T.logout().then(function () { location.reload(); });
   });
+  // Ejecuta un cambio (en la demo es inmediato; con reservas reales va a la base)
+  function guardar(promesa, okMsg) {
+    return promesa.then(function () { if (okMsg) toast(okMsg); render(); }, function (err) {
+      toast(err.message || "No se pudo guardar.");
+      if (err.codigo === "SESION") location.reload();
+      throw err;
+    });
+  }
 
   /* ---------------- Estado ---------------- */
   var view = "agenda", day = today();
+  // Si hoy el local está cerrado, la agenda arranca en el próximo día abierto
+  for (var i = 0; i < 7 && (!(C.horarios[day.getDay()] || []).length || C.diasCerrados.indexOf(dateKey(day)) >= 0); i++) day = addDays(day, 1);
   var filters = { turnos: "hoy", clientes: "todos" };
 
   $("#sideNav").addEventListener("click", function (e) {
@@ -241,13 +262,11 @@
   $("#modalBody").addEventListener("click", function (e) {
     var b = e.target.closest("[data-act]"); if (!b) return;
     var act = b.getAttribute("data-act"), code = b.getAttribute("data-code");
-    if (act === "del") { T.remove(code); toast("Bloqueo eliminado."); }
-    else {
-      if (act === "cancelado" && !window.confirm("¿Cancelar este turno? El horario queda libre.")) return;
-      T.update(code, { estado: act });
-      toast({ atendido: "Marcado como atendido.", ausente: "Marcado como ausente.", confirmado: "Turno confirmado.", cancelado: "Turno cancelado." }[act]);
-    }
-    closeModal(); render();
+    if (act === "del") { closeModal(); guardar(T.remove(code), "Bloqueo eliminado.").catch(function () {}); return; }
+    if (act === "cancelado" && !window.confirm("¿Cancelar este turno? El horario queda libre.")) return;
+    closeModal();
+    guardar(T.update(code, { estado: act, canceladoPor: "local" }),
+      { atendido: "Marcado como atendido.", ausente: "Marcado como ausente.", confirmado: "Turno confirmado.", cancelado: "Turno cancelado." }[act]).catch(function () {});
   });
 
   /* Nuevo turno manual */
@@ -304,12 +323,12 @@
       var s = svcById(f.elements.svc.value);
       if (!f.elements.time.value) return toast("No hay horario libre para esa combinación.");
       if (f.elements.nombre.value.trim().length < 2 || f.elements.telefono.value.replace(/\D/g, "").length < 6) return toast("Completá nombre y teléfono.");
-      T.add({
-        code: T.code(), svcs: [s.id], pro: f.elements.pro.value, date: f.elements.date.value, time: f.elements.time.value,
+      var fecha = f.elements.date.value;
+      guardar(T.add({
+        code: T.code(), svcs: [s.id], pro: f.elements.pro.value, date: fecha, time: f.elements.time.value,
         dur: s.duracion, total: s.precio, nombre: f.elements.nombre.value.trim(), telefono: f.elements.telefono.value.trim(),
         email: "", nota: f.elements.nota.value.trim(), estado: "confirmado", origen: "local", sena: 0, creado: new Date().toISOString()
-      });
-      closeModal(); day = parseKey(f.elements.date.value); toast("Turno guardado."); render();
+      }).then(function () { closeModal(); day = parseKey(fecha); }), "Turno guardado.").catch(function () {});
     });
   }
   $("#newBtn").addEventListener("click", function () { openNew({}); });
@@ -330,11 +349,17 @@
       var f = this, a = toMin(f.elements.from.value), b = toMin(f.elements.to.value);
       if (!(b > a)) return toast("El horario 'hasta' debe ser mayor.");
       var pros = f.elements.pro.value === "*" ? C.equipo.map(function (p) { return p.id; }) : [f.elements.pro.value];
-      pros.forEach(function (pid) {
-        T.add({ code: T.code(), tipo: "bloqueo", svcs: [], pro: pid, date: f.elements.date.value, time: toHHMM(a), dur: b - a, total: 0,
-          nombre: "Bloqueado", telefono: "", nota: f.elements.nota.value.trim(), estado: "confirmado", origen: "local", creado: new Date().toISOString() });
+      var fecha = f.elements.date.value, fallidos = [];
+      // Un bloqueo no puede pisar turnos ya tomados: esos profesionales se informan
+      var tareas = pros.map(function (pid) {
+        return T.add({ code: T.code(), tipo: "bloqueo", svcs: [], pro: pid, date: fecha, time: toHHMM(a), dur: b - a, total: 0,
+          nombre: "Bloqueado", telefono: "", nota: f.elements.nota.value.trim(), estado: "confirmado", origen: "local", creado: new Date().toISOString() })
+          .catch(function () { fallidos.push((proById(pid) || {}).nombre || pid); });
       });
-      closeModal(); day = parseKey(f.elements.date.value); toast("Horario bloqueado: ya no se puede reservar online."); render();
+      Promise.all(tareas).then(function () {
+        closeModal(); day = parseKey(fecha); render();
+        toast(fallidos.length ? "No se bloqueó a " + fallidos.join(", ") + ": ya tiene turnos en ese horario." : "Horario bloqueado: ya no se puede reservar online.");
+      });
     });
   });
 
@@ -464,19 +489,14 @@
     T.resetDemo(); toast("Datos de demo regenerados."); render();
   });
 
-  // Si alguien reserva desde la web en otra pestaña, aparece al instante
-  window.addEventListener("storage", function (e) {
-    if (!e.key || e.key.indexOf("turnos-") !== 0 || $("#app").hidden) return;
-    var prev = JSON.parse(e.oldValue || "[]"), next = JSON.parse(e.newValue || "[]");
-    if (next.length > prev.length) {
-      var b = next[next.length - 1];
-      if (b && b.tipo !== "bloqueo") toast("🔔 Nuevo turno: " + b.nombre + " · " + fmtCorto(b.date) + " " + b.time);
-    }
+  // Turnos nuevos desde la web: en la demo al instante (otra pestaña), con reservas reales cada 30 s
+  T.onChange(function (nuevos) {
+    if ($("#app").hidden) return;
+    var b = nuevos.filter(function (x) { return x.tipo !== "bloqueo" && x.origen === "web"; }).pop();
+    if (b) toast("🔔 Nuevo turno: " + b.nombre + " · " + fmtCorto(b.date) + " " + b.time);
     render();
   });
   setInterval(function () { if (!$("#app").hidden && view === "agenda") renderAgenda(); }, 60000);
 
-  var ok = null;
-  try { ok = sessionStorage.getItem("panel-ok"); } catch (e) {}
-  if (ok) enter();
+  if (T.hasSession()) cargarYEntrar().catch(function (err) { toast(err.message); T.logout(); });
 })();

@@ -18,6 +18,15 @@
   // cada local). Ponelo en false cuando entregues la web a un cliente.
   var MOSTRAR_SELECTOR_DEMO = true;
 
+  // RESERVAS REALES (Supabase). Con "slug" vacío la web funciona como DEMO
+  // (turnos guardados en el navegador, con datos de ejemplo). Para un local real:
+  // poné su slug (el mismo que diste de alta en Supabase) y MOSTRAR_SELECTOR_DEMO = false.
+  var BACKEND = {
+    url: "https://vsecvfeejulnmvsskhbl.supabase.co",
+    key: "sb_publishable_vuLnnM48fnJjc94qmNJ8cA_-2L2WkL_", // clave pública: está bien que esté en la web
+    slug: ""
+  };
+
   // TUS DATOS (quien vende la web). Aparecen en el pie y en el aviso de demo
   // para que el local pueda contactarte. Dejá whatsapp vacío para ocultarlo.
   var VENDEDOR = {
@@ -43,7 +52,7 @@
           "Web profesional con tu nombre, colores y fotos",
           "Reservas online 24/7 con cobro de seña",
           "Panel del dueño: agenda, clientes y estadísticas",
-          "Recordatorios y mensajes por WhatsApp",
+          "Recordatorios por WhatsApp con un toque desde el panel",
           "Botón de reservas en tu Instagram y Google Maps",
           "Código QR de reservas para tu mostrador y vidriera",
           "Cambios de horarios, feriados y vacaciones",
@@ -405,6 +414,8 @@
   cfg.mostrarSelectorDemo = MOSTRAR_SELECTOR_DEMO && q.limpio !== "1";
   cfg.esDemo = MOSTRAR_SELECTOR_DEMO;
   cfg.vendedor = VENDEDOR;
+  cfg.backend = BACKEND.slug ? BACKEND : null;
+  if (cfg.backend) cfg.esDemo = false;
   cfg.faq = (base.faq || []).concat(comunes.faqComun || []);
   cfg.params = q;
   // Prefijo hasta la raíz del sitio ("" en la raíz, "../" en /unas/, etc.)

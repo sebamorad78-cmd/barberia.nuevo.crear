@@ -40,7 +40,6 @@
     try { fn(); } catch (e) { if (window.console) console.warn("[" + name + "]", e); }
   };
   var T = window.__TURNOS__;
-  var store = { get: T.all, set: T.save };
   var senaDe = function (total) { return C.sena && C.sena.activa ? Math.round(total * C.sena.porcentaje / 100 / 100) * 100 : 0; };
   // Links a otras páginas conservando la personalización (y el rubro, que en /unas/ no va en la URL)
   var conParams = function (url) {
@@ -571,9 +570,17 @@
       if (step === 1) renderSvcs();
       if (step === 2) renderPros();
       if (step === 3) {
-        if (!st.date || !dayOpen(parseKey(st.date))) { st.date = firstOpenDay(); st.time = null; }
-        if (st.date) { var d = parseKey(st.date); st.month = new Date(d.getFullYear(), d.getMonth(), 1); }
-        renderCalendar(); renderSlots();
+        var pintar = function () {
+          if (!st.date || !dayOpen(parseKey(st.date))) { st.date = firstOpenDay(); st.time = null; }
+          if (st.date) { var d = parseKey(st.date); st.month = new Date(d.getFullYear(), d.getMonth(), 1); }
+          renderCalendar(); renderSlots(); update();
+        };
+        if (T.remoto) {
+          // Reservas reales: se consultan los horarios ocupados en el momento
+          $("#calendar").innerHTML = '<p class="slots__empty">Cargando horarios disponibles…</p>';
+          $("#slots").innerHTML = ""; $("#slotsLabel").textContent = "";
+          T.refresh().then(pintar, function (err) { toast(err.message); pintar(); });
+        } else pintar();
       }
       update();
       // Que la barra de pasos quede visible debajo del header fijo (usa scroll-margin-top de .booking)
@@ -610,16 +617,23 @@
       if (!isProFree(pro, st.date, t, dur)) { toast("Ese horario se acaba de ocupar. Elegí otro."); return go(3); }
       var f = $("#bookingForm");
       var b = {
-        code: Math.random().toString(36).slice(2, 7).toUpperCase(),
+        code: "",
         svcs: st.svcs.slice(), pro: pro, date: st.date, time: st.time, dur: dur, total: totalPrice(),
         nombre: f.elements.nombre.value.trim(), telefono: f.elements.telefono.value.trim(),
         email: f.elements.email.value.trim(), nota: f.elements.nota.value.trim(),
         recordatorio: f.elements.recordatorio.checked, creado: new Date().toISOString(),
         estado: "confirmado", origen: "web", sena: senaDe(totalPrice()), propio: true
       };
-      T.add(b);
-      showSuccess(b);
-      renderMine();
+      var btn = $("#nextBtn");
+      btn.disabled = true; btn.textContent = "Reservando…";
+      T.reservar(b).then(function () {
+        showSuccess(b);
+        renderMine();
+      }, function (err) {
+        btn.disabled = false; btn.textContent = "Confirmar turno";
+        toast(err.message || "No pudimos reservar. Probá de nuevo.");
+        if (err.codigo === "OCUPADO" || err.codigo === "FECHA_INVALIDA") { st.time = null; go(3); }
+      });
     }
 
     function showSuccess(b) {
@@ -672,7 +686,7 @@
     /* Mis turnos (guardados en este navegador) */
     function renderMine() {
       var now = dateKey(new Date());
-      var mine = store.get().filter(function (b) { return b.propio && b.estado !== "cancelado" && b.date >= now; }).sort(function (a, b) { return (a.date + a.time).localeCompare(b.date + b.time); });
+      var mine = T.mine().filter(function (b) { return b.estado !== "cancelado" && b.date >= now; }).sort(function (a, b) { return (a.date + a.time).localeCompare(b.date + b.time); });
       var box2 = $("#myBookings");
       box2.hidden = !mine.length;
       $("#myBookingsList").innerHTML = mine.map(function (b) {
@@ -685,9 +699,11 @@
       var b = e.target.closest("[data-cancel]"); if (!b) return;
       var code = b.getAttribute("data-cancel");
       if (!window.confirm("¿Cancelar el turno " + code + "?")) return;
-      T.update(code, { estado: "cancelado", canceladoPor: "cliente" });
-      renderMine(); toast("Turno cancelado.");
-      if (st.step === 3) { renderCalendar(); renderSlots(); }
+      b.disabled = true;
+      T.cancelar(code).then(function () {
+        renderMine(); toast("Turno cancelado.");
+        if (st.step === 3) { renderCalendar(); renderSlots(); }
+      }, function (err) { b.disabled = false; toast(err.message); });
     });
 
     renderSvcs(); update(); renderMine();
@@ -897,7 +913,7 @@
     safe(initFaq, "faq");
     safe(initHours, "hours");
     safe(initStatus, "status");
-    safe(initNextSlot, "nextslot");
+    T.ready.then(function () { safe(initNextSlot, "nextslot"); });
     safe(initPayments, "payments");
     safe(initLegal, "legal");
     safe(initNav, "nav");

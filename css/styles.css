@@ -646,11 +646,22 @@ em { font-style: italic; color: var(--accent); }
   .footer { padding-bottom: 100px; }
 }
 @media (max-width: 480px) {
+  /* Portada compacta: título, botones y cifras entran en la primera pantalla */
+  .hero { padding-top: 92px; }
+  .hero__title { font-size: calc(clamp(2.3rem, 11vw, 3rem) * var(--ds)); margin-bottom: 12px; }
+  .hero__eyebrow { margin-bottom: 12px; font-size: 11px; }
+  .hero__lead { font-size: .98rem; line-height: 1.5; margin-bottom: 18px; }
+  .hero__cta { gap: 10px; }
+  .hero__cta .btn { --pad: 14px 16px; font-size: 15px; }
+  .next-slot { margin-top: 14px; padding: 8px 14px; font-size: 13px; }
+  .hero__stats { margin-top: 18px; gap: 18px; }
+  .hero__stats strong { font-size: 1.6rem; }
+  .hero__stats span { font-size: 11px; letter-spacing: .08em; }
   .next-slot__l { display: none; }
   .next-slot__s { display: inline; }
   .gallery__item:not(:nth-child(3n+1)) .img-fallback small { display: none; }
   .hero { padding-bottom: 60px; }
-  .hero__cta .btn { flex: 1 1 100%; }
+  .hero__cta .btn { flex: 1 1 0; }
   .slots__grid { grid-template-columns: repeat(3, 1fr); }
   .price { grid-template-columns: 1fr auto; }
   .price__name, .price__value { font-size: 1.25rem; }
