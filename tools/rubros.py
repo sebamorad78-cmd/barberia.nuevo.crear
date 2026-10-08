@@ -79,7 +79,7 @@ VENDER.update({k: RUBROS["barberia"][k] for k in ("bg", "surface", "surface2", "
 ORDEN = ["barberia", "salon", "spa", "unas"]
 # URL usada si no se pasa --url ni existe la variable URL (deploy arrastrando la carpeta).
 # Poné acá el nombre exacto de tu sitio en Netlify.
-SITIO_POR_DEFECTO = "https://turnos-mdp.netlify.app"
+SITIO_POR_DEFECTO = "https://paginas-profesionales-e9641c.netlify.app"
 MARCA_INI, MARCA_FIN = "<!-- OG:START", "<!-- OG:END -->"
 
 
