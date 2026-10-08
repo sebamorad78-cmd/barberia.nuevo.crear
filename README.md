@@ -8,7 +8,7 @@ Sitio estático (HTML + CSS + JS, sin instalar nada) pensado como **maqueta para
 |---|---|
 | `index.html` | La web del local: servicios y precios, promos, galería, equipo, opiniones, horarios, mapa, FAQ y **reserva online en 4 pasos** con seña. |
 | `admin.html` | **Panel del dueño** (PIN demo `1234`): agenda por profesional, turnos manuales, bloqueo de horarios, estados (atendido / no vino), clientes, recordatorios y pedido de reseñas por WhatsApp, y estadísticas. Viene con datos de ejemplo. |
-| `vender.html` | **Tu página comercial**: beneficios, demos en vivo de los 4 rubros, generador de demo con el nombre del local, cómo trabajás, planes y precios, preguntas frecuentes. |
+| `vender.html` | **Tu página comercial** (se ve en la raíz del sitio, `https://paginas-profesionales-1212.netlify.app/`, gracias a `_redirects`): beneficios, demos en vivo de los 4 rubros, generador de demo con el nombre del local, cómo trabajás, planes y precios, preguntas frecuentes. |
 
 ## 4 estilos (paleta y tipografía propias, contraste verificado WCAG AA)
 | Rubro | Paleta | Tipografía | Sensación |
@@ -47,7 +47,7 @@ WhatsApp no ejecuta JavaScript: arma la tarjeta del link leyendo el HTML. Por es
 | `/salon/` | "Así se vería la web de tu salón de belleza" + imagen marfil y baya |
 | `/spa/` | "Así se vería la web de tu spa o centro de estética" + imagen salvia |
 | `/unas/` | "Así se vería la web de tu nail bar" + imagen negro y nude |
-| `/vender.html` | "Webs con turnos online para tu local · Mar del Plata" |
+| `/` (raíz) | "Webs con turnos online para tu local · Mar del Plata" (página de ventas) |
 
 Las genera `tools/rubros.py` a partir de `index.html` (imágenes en `assets/og/`). **Si cambiás `index.html`, volvé a correrlo**:
 `python3 tools/rubros.py --url https://TU-SITIO.netlify.app` (agregá `--imagenes` para redibujar las imágenes; los textos se editan en el mismo script).

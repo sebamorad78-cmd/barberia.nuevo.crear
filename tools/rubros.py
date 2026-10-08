@@ -79,7 +79,7 @@ VENDER.update({k: RUBROS["barberia"][k] for k in ("bg", "surface", "surface2", "
 ORDEN = ["barberia", "salon", "spa", "unas"]
 # URL usada si no se pasa --url ni existe la variable URL (deploy arrastrando la carpeta).
 # Poné acá el nombre exacto de tu sitio en Netlify.
-SITIO_POR_DEFECTO = "https://paginas-profesionales-e9641c.netlify.app"
+SITIO_POR_DEFECTO = "https://paginas-profesionales-1212.netlify.app"
 MARCA_INI, MARCA_FIN = "<!-- OG:START", "<!-- OG:END -->"
 
 
@@ -250,7 +250,7 @@ def main():
     plantilla = open(ruta_index, encoding="utf-8").read()
 
     # Raíz = barbería (rubro por defecto)
-    raiz = reemplazar_bloque(plantilla, bloque_og(RUBROS["barberia"], abs_(""), abs_("assets/og/barberia.jpg" + version)))
+    raiz = reemplazar_bloque(plantilla, bloque_og(RUBROS["barberia"], abs_("barberia/"), abs_("assets/og/barberia.jpg" + version)))
     open(ruta_index, "w", encoding="utf-8").write(raiz)
 
     for modo in ORDEN:
@@ -262,7 +262,7 @@ def main():
 
     ruta_v = os.path.join(RAIZ, "vender.html")
     v = open(ruta_v, encoding="utf-8").read()
-    v = reemplazar_bloque(v, bloque_og(VENDER, abs_("vender.html"), abs_("assets/og/vender.jpg" + version)))
+    v = reemplazar_bloque(v, bloque_og(VENDER, abs_(""), abs_("assets/og/vender.jpg" + version)))
     open(ruta_v, "w", encoding="utf-8").write(v)
     print("vender.html")
     print("Base:", base or "(sin URL)")
