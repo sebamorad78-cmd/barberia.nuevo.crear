@@ -51,6 +51,14 @@
   .phone::before { content: ""; position: absolute; z-index: 5; top: 22px; left: 50%; width: 30%; height: 26px; transform: translateX(-50%); border-radius: 16px; background: #050505; }
   .screen { position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: hidden; background: #1d1a15; }
   .screen img { position: absolute; left: 0; width: 100%; }
+  .sbar { position: absolute; z-index: 3; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 9% 0 11%;
+    background: #0e0d0b; color: var(--paper); font-weight: 700; letter-spacing: .01em; }
+  .sbar .ic { display: flex; align-items: flex-end; gap: .14em; }
+  .sbar .ic i { display: block; width: .2em; background: var(--paper); border-radius: 1px; }
+  .sbar .ic i:nth-child(1) { height: .35em; } .sbar .ic i:nth-child(2) { height: .5em; } .sbar .ic i:nth-child(3) { height: .65em; } .sbar .ic i:nth-child(4) { height: .8em; }
+  .sbar .ic b { display: block; margin-left: .35em; width: 1.55em; height: .8em; border: .1em solid var(--paper); border-radius: .22em; position: relative; }
+  .sbar .ic b::after { content: ""; position: absolute; inset: .1em; right: .3em; background: var(--paper); border-radius: .08em; }
+  .navimg { position: absolute !important; z-index: 3; left: 0; width: 100%; }
   .confirm { position: absolute; z-index: 4; left: 5%; right: 5%; bottom: 4.5%; height: 8.5%; border-radius: 14px; background: var(--brass); color: #15110a;
     display: flex; align-items: center; justify-content: center; font-weight: 700; letter-spacing: .01em; box-shadow: 0 -18px 40px 6px #1d1a15; opacity: 0; }
   .tap { position: absolute; z-index: 6; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; pointer-events: none; opacity: 0; }
@@ -82,7 +90,7 @@
   .f45 .points p { margin-top: 5px; font-size: 20px; }
   .f45 .offer { padding-top: 22px; }
   .f45 .offer strong { padding: 12px 22px; font-size: 17px; }
-  .f45 .offer p { margin-top: 12px; font-size: 18px; }
+  .f45 .offer p { font-size: 19px; letter-spacing: .02em; }
   .f45 .foot { margin-top: 30px; padding-top: 28px; grid-template-columns: 156px 1fr; gap: 40px; }
   .f45 .qr { width: 156px; height: 156px; padding: 13px; }
   .f45 .cta { font-size: 38px; }
@@ -103,7 +111,7 @@
   .f916 .points p { margin-top: 9px; font-size: 23px; }
   .f916 .offer { padding-top: 26px; }
   .f916 .offer strong { padding: 15px 26px; font-size: 20px; }
-  .f916 .offer p { margin-top: 15px; font-size: 21px; }
+  .f916 .offer p { font-size: 22px; letter-spacing: .02em; }
   .f916 .foot { margin-top: 44px; padding-top: 40px; grid-template-columns: 190px 1fr; gap: 44px; }
   .f916 .qr { width: 190px; height: 190px; padding: 15px; }
   .f916 .cta { font-size: 45px; }
@@ -132,12 +140,13 @@
         <li data-a="3.25 .75 up"><span class="rule" data-a="3.2 .8 line"></span><span class="n">03</span><h3>Todo resuelto</h3><p>Agenda de tu equipo y mantenimiento: los cambios los hago&nbsp;yo.</p></li>
       </ol>
       <div class="offer">
-        <strong data-a="6.95 .6 pop">Primer mes sin cargo</strong>
-        <p data-a="7.2 .6 up">Abono fijo · Sin comisión por turno · Sin&nbsp;permanencia</p>
+        <p data-a="7.0 .7 up">Abono fijo mensual · Sin comisión por turno · Sin&nbsp;permanencia</p>
       </div>
     </div>
     <div class="phone" id="phone" data-a="1.95 1.0 rise">
       <div class="screen" id="screen">
+        <div class="sbar" id="sbar"><span>9:41</span><span class="ic"><i></i><i></i><i></i><i></i><b></b></span></div>
+        <img src="nav.png" id="navimg" class="navimg" alt="">
         <img src="s1.png" id="s1" alt=""><img src="s2.png" id="s2" alt=""><img src="s3.png" id="s3" alt=""><img src="s4.png" id="s4" alt="">
         <div class="confirm" id="confirm">Confirmar turno · <span id="confHora"></span></div>
         <div class="tap" id="tap"><span class="dot"></span><span class="ring"></span></div>
@@ -191,7 +200,11 @@
   fetch("toques.json").then(function (r) { return r.json(); }).then(function (j) { toques = j; window.LISTO = true; });
 
   function screenLayout() {
-    var sc = document.getElementById("screen"), W = sc.clientWidth, k = W / (toques ? toques.ancho : 390), sb = Math.round(W * 0.13);
+    var sc = document.getElementById("screen"), W = sc.clientWidth, k = W / (toques ? toques.ancho : 390), st = Math.round(W * 0.12);
+    // Barra de estado del celular (hora, señal, batería) + encabezado fijo del sitio; el contenido arranca debajo
+    var bar = document.getElementById("sbar"); bar.style.height = st + "px"; bar.style.fontSize = Math.round(W * 0.042) + "px";
+    var nav = document.getElementById("navimg"); nav.style.top = st + "px";
+    var sb = st + Math.round((toques ? toques.nav : 77) * k);
     return { k: k, sb: sb, W: W, H: sc.clientHeight };
   }
 

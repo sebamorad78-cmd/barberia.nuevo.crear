@@ -68,7 +68,7 @@ RUBROS = {
 
 VENDER = {
     "titulo": "Webs con turnos online para tu local · Mar del Plata",
-    "descripcion": "Barberías, peluquerías, spas y nail bars: tus clientes reservan solos 24/7, con seña, agenda y recordatorios por WhatsApp. Primer mes sin cargo.",
+    "descripcion": "Barberías, peluquerías, spas y nail bars: tus clientes reservan solos 24/7, con seña, agenda y recordatorios por WhatsApp.",
     "imagen_alt": "Webs con turnos online para barberías, salones, spas y nail bars",
     "titular": ["Tu local recibe turnos", "mientras dormís."],
     "detalle": "Barberías · Salones · Spas · Nail bars · Mar del Plata",

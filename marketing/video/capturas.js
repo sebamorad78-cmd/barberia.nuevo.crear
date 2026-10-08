@@ -14,7 +14,7 @@ const OUT = __dirname;
   await p.click('.price >> nth=0'); await p.waitForTimeout(400);
   await p.click('#nextBtn'); await p.waitForTimeout(300);
   await p.click('#proPick .opt[data-id="martin"]'); await p.click('#nextBtn'); await p.waitForTimeout(900);
-  await p.addStyleTag({ content: '.wa-float,.mobile-cta,.toast,.nav{display:none!important} .booking{border-radius:0!important;box-shadow:none!important;border:0!important} *{transition:none!important;animation:none!important} .success__icon circle,.success__icon path{stroke-dashoffset:0!important}' });
+  await p.addStyleTag({ content: '.wa-float,.mobile-cta,.toast{display:none!important} .steps{display:none!important} .booking{border-radius:0!important;box-shadow:none!important;border:0!important} *{transition:none!important;animation:none!important} .success__icon circle,.success__icon path{stroke-dashoffset:0!important}' });
   // día con varios ocupados y huecos libres (no el primero, para que haya un "toque")
   const days = await p.$$eval('.cal__day:not(:disabled)', xs => xs.map(x => x.dataset.date));
   let best = null, bestBusy = -1;
@@ -22,11 +22,15 @@ const OUT = __dirname;
     const n = await p.$$eval('#slots .slot.is-busy', x => x.length); if (n > bestBusy && n < 9) { bestBusy = n; best = d; } }
   const box = await p.$('#booking');
   const H = 760, info = {};
+  // Pantalla completa del celular (390 px de ancho) sin la barra de pasos; el encabezado del sitio se captura aparte
   async function shot(name) {
-    await p.mouse.move(0, 0); await box.scrollIntoViewIfNeeded(); await p.waitForTimeout(250);
+    await p.mouse.move(0, 0);
+    await p.evaluate(() => { document.querySelector('.nav').style.visibility = 'hidden'; document.querySelector('#booking').scrollIntoView({ block: 'start' }); window.scrollBy(0, -12); });
+    await p.waitForTimeout(250);
     const r = await box.boundingBox();
-    await p.screenshot({ path: path.join(OUT, name + '.png'), clip: { x: r.x, y: r.y, width: r.width, height: H } });
-    return r;
+    const clip = { x: 0, y: Math.max(0, r.y - 12), width: 390, height: H };
+    await p.screenshot({ path: path.join(OUT, name + '.png'), clip });
+    return { x: 0, y: clip.y };
   }
   const rel = async (sel, r) => { const e = await (await p.$(sel)).boundingBox(); return { x: e.x - r.x + e.width / 2, y: e.y - r.y + e.height / 2 }; };
   // 1) día inicial seleccionado
@@ -47,7 +51,12 @@ const OUT = __dirname;
   await p.fill('#bookingForm [name=nombre]', 'Lucas Fernández'); await p.fill('#bookingForm [name=telefono]', '223 555 0101');
   await p.click('#nextBtn'); await p.waitForTimeout(900);
   r = await shot('s4');
-  info.ancho = r.width; info.alto = H; info.dia = best; info.hora = hora;
+  // Encabezado fijo del sitio (nombre del local + menú), tal como se ve en el celular
+  await p.evaluate(() => { const n = document.querySelector('.nav'); n.style.visibility = 'visible'; n.classList.add('is-scrolled'); n.classList.remove('is-open'); n.style.background = getComputedStyle(document.body).backgroundColor; n.style.backdropFilter = 'none'; n.style.webkitBackdropFilter = 'none'; });
+  await p.waitForTimeout(200);
+  const nh = await p.evaluate(() => document.querySelector('.nav').offsetHeight);
+  await p.screenshot({ path: path.join(OUT, 'nav.png'), clip: { x: 0, y: 0, width: 390, height: nh } });
+  info.ancho = 390; info.alto = H; info.nav = nh; info.dia = best; info.hora = hora;
   fs.writeFileSync(path.join(OUT, 'toques.json'), JSON.stringify(info, null, 1));
   console.log(info);
   await b.close();

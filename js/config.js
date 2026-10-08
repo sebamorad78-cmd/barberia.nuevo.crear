@@ -40,7 +40,7 @@
     cotizacion: 1540,
     cotizacionFuente: "dólar oficial Banco Nación",
     // Ofertas de entrada (bajan la barrera para que el local diga que sí). Poné false para ocultarlas.
-    primerMesGratis: true,
+    primerMesGratis: false,
     instalacionGratis: true,
     mesesRegaloAnual: 2,          // pagando 12 meses juntos, estos meses van de regalo (0 = sin oferta anual)
     precioReferenciaServicio: 15000, // corte promedio, para decir "se paga con N turnos"
