@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Flyer · Webs con turnos online</title>
+<style>
+  /* Tipografías de la marca (archivos locales, sin depender de internet) */
+  @font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-300-normal.woff2) format("woff2"); font-weight: 300; }
+  @font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-300-italic.woff2) format("woff2"); font-weight: 300; font-style: italic; }
+  @font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-400-italic.woff2) format("woff2"); font-weight: 400; font-style: italic; }
+  @font-face { font-family: "Manrope"; src: url(fonts/manrope-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Manrope"; src: url(fonts/manrope-latin-500-normal.woff2) format("woff2"); font-weight: 500; }
+  @font-face { font-family: "Manrope"; src: url(fonts/manrope-latin-600-normal.woff2) format("woff2"); font-weight: 600; }
+  @font-face { font-family: "Manrope"; src: url(fonts/manrope-latin-700-normal.woff2) format("woff2"); font-weight: 700; }
+  @font-face { font-family: "Manrope"; src: url(fonts/manrope-latin-800-normal.woff2) format("woff2"); font-weight: 800; }
+
+  :root {
+    --ink: #0e0d0b;      /* fondo carbón */
+    --ink-2: #171511;
+    --paper: #f1ebe0;    /* crema */
+    --muted: #a69c8c;
+    --brass: #c9a45c;    /* acento latón */
+    --line: rgba(241, 235, 224, .16);
+    --w: 148mm;          /* A5 */
+    --h: 210mm;
+    --bleed: 0mm;        /* 3mm en la versión de imprenta */
+    --m: 11mm;           /* margen de seguridad */
+  }
+  @page { margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #2a2824; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .sheet {
+    position: relative;
+    width: calc(var(--w) + 2 * var(--bleed));
+    height: calc(var(--h) + 2 * var(--bleed));
+    padding: calc(var(--bleed) + var(--m));
+    background:
+      radial-gradient(70mm 60mm at 110% 38%, rgba(201, 164, 92, .16), transparent 70%),
+      var(--ink);
+    color: var(--paper);
+    font-family: "Manrope", sans-serif;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+    word-spacing: .06em;
+  }
+
+  /* Cabecera */
+  .top { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 3.2mm; border-bottom: .25mm solid var(--line); }
+  .brand { font-family: "Fraunces", serif; font-size: 4.2mm; letter-spacing: .01em; }
+  .brand span { color: var(--brass); font-style: italic; }
+  .place { font-size: 2.2mm; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--muted); }
+
+  /* Titular */
+  .kicker { margin-top: 8.5mm; font-size: 2.3mm; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; color: var(--brass); }
+  h1 { margin-top: 3mm; font-family: "Fraunces", serif; font-weight: 300; font-size: 10.8mm; word-spacing: 0; line-height: .98; letter-spacing: -.025em; }
+  h1 em { display: block; font-style: italic; font-weight: 300; color: var(--brass); }
+  .lead { margin-top: 4mm; max-width: 84mm; font-size: 3.1mm; line-height: 1.5; color: rgba(241, 235, 224, .78); }
+
+  /* Cuerpo: beneficios + celular */
+  .body { display: grid; grid-template-columns: 1fr auto; grid-template-rows: minmax(0, 1fr); gap: 8mm; margin-top: 7mm; min-height: 0; overflow: hidden; padding-bottom: 1mm; }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+  .points { list-style: none; display: flex; flex-direction: column; gap: 4mm; }
+  .points li { display: grid; grid-template-columns: 8mm 1fr; column-gap: 2mm; padding-top: 3.4mm; border-top: .25mm solid var(--line); }
+  .points .n { font-family: "Fraunces", serif; font-style: italic; font-size: 4.6mm; color: var(--brass); line-height: 1; }
+  .points h3 { font-size: 3.15mm; font-weight: 700; letter-spacing: .005em; line-height: 1.25; }
+  .points p { grid-column: 2; margin-top: 1mm; font-size: 2.6mm; line-height: 1.45; color: var(--muted); }
+
+  .offer { margin-top: auto; padding-top: 4mm; }
+  .offer strong { display: inline-block; padding: 1.7mm 3.2mm; border: .3mm solid var(--brass); color: var(--brass); font-size: 2.35mm; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+  .offer p { margin-top: 2.2mm; font-size: 2.45mm; color: var(--muted); letter-spacing: .01em; }
+
+  /* Celular con la captura real del sistema */
+  .phone { position: relative; height: 100%; width: auto; aspect-ratio: 390 / 820; justify-self: end; border-radius: 7.2mm; padding: 1.5mm; background: #050505;
+    box-shadow: 0 0 0 .3mm #2c2a26, 0 10mm 16mm -6mm rgba(0, 0, 0, .75), 0 0 22mm -6mm rgba(201, 164, 92, .35); }
+  .phone::before { content: ""; position: absolute; z-index: 2; top: 2.6mm; left: 50%; width: 12mm; height: 3.2mm; transform: translateX(-50%); border-radius: 2mm; background: #050505; }
+  .screen { width: 100%; height: 100%; border-radius: 5.9mm; overflow: hidden; background: #1d1a15; position: relative; }
+  .screen .status { height: 6.5mm; background: #1d1a15; }
+  .screen img { display: block; width: 100%; }
+
+  /* Pie: QR + contacto */
+  .foot { margin-top: 6mm; display: grid; grid-template-columns: 25mm 1fr; gap: 6mm; align-items: center; padding-top: 6mm; border-top: .25mm solid var(--line); }
+  .qr { width: 25mm; height: 25mm; padding: 2.2mm; background: var(--paper); border-radius: 1.2mm; }
+  .qr svg { display: block; width: 100%; height: 100%; }
+  .cta { font-family: "Fraunces", serif; font-size: 5.4mm; line-height: 1.1; letter-spacing: -.01em; }
+  .cta em { color: var(--brass); }
+  .url { margin-top: 1.6mm; font-size: 2.35mm; color: var(--muted); letter-spacing: .01em; }
+  .contact { margin-top: 3.4mm; display: flex; align-items: baseline; gap: 3mm; flex-wrap: wrap; }
+  .contact .wa { font-size: 4.1mm; font-weight: 700; letter-spacing: .02em; }
+  .contact .lbl { font-size: 2.1mm; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--brass); }
+  .contact .name { width: 100%; font-size: 2.45mm; color: var(--muted); }
+
+  /* Versión redes 4:5 (148 x 185 mm): misma grilla, un poco más compacta */
+  .social { --h: 185mm; --m: 9.5mm; }
+  .social .kicker { margin-top: 6mm; }
+  .social h1 { font-size: 10.2mm; }
+  .social .lead { margin-top: 3.2mm; }
+  .social .body { margin-top: 5mm; }
+  .social .points { gap: 3mm; }
+  .social .points li { padding-top: 2.6mm; }
+  .social .foot { margin-top: 5mm; padding-top: 4.5mm; grid-template-columns: 22mm 1fr; }
+  .social .qr { width: 22mm; height: 22mm; }
+</style>
+</head>
+<body>
+  <div class="sheet" id="sheet">
+    <header class="top">
+      <div class="brand">Sebastian Morad <span>· webs con turnos</span></div>
+      <div class="place">Mar del Plata</div>
+    </header>
+
+    <p class="kicker">Barberías · Peluquerías · Spas · Nail bars</p>
+    <h1>Tu local recibe turnos <em>mientras dormís.</em></h1>
+    <p class="lead">Una web con tu marca donde tus clientes reservan solos, las 24 horas. Vos te ocupás de atender.</p>
+
+    <section class="body">
+      <div class="col">
+        <ol class="points">
+          <li><span class="n">01</span><h3>Reservas online 24/7</h3><p>Eligen servicio, profesional, día y horario sin escribirte.</p></li>
+          <li><span class="n">02</span><h3>Menos turnos perdidos</h3><p>Seña al reservar y recordatorio por WhatsApp.</p></li>
+          <li><span class="n">03</span><h3>Todo resuelto</h3><p>Agenda de tu equipo y mantenimiento: los cambios los hago&nbsp;yo.</p></li>
+        </ol>
+        <div class="offer">
+          <strong>Primer mes sin cargo</strong>
+          <p>Abono fijo · Sin comisión por turno · Sin permanencia</p>
+        </div>
+      </div>
+      <div class="phone"><div class="screen"><div class="status"></div><img src="captura-reserva.png" alt=""></div></div>
+    </section>
+
+    <footer class="foot">
+      <div class="qr"><img src="qr.svg" alt="Código QR a la demo" style="display:block;width:100%;height:100%"></div>
+      <div>
+        <p class="cta">Escaneá y <em>probá la demo.</em></p>
+        <p class="url">paginas-profesionales-1212.netlify.app</p>
+        <div class="contact">
+          <span class="lbl">WhatsApp</span><span class="wa">2268 51-6801</span>
+          <span class="name">Sebastian Morad · atención en persona en Mar del Plata</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+<script>
+  // Variantes: ?bleed=1 (imprenta, +3 mm por lado) · ?social=1 (4:5 para redes)
+  var q = new URLSearchParams(location.search), s = document.getElementById("sheet");
+  if (q.get("bleed") === "1") s.style.setProperty("--bleed", "3mm");
+  if (q.get("social") === "1") s.classList.add("social");
+</script>
+</body>
+</html>
