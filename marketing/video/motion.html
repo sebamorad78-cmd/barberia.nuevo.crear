@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Video · Webs con turnos online</title>
+<style>
+  @font-face { font-family: "Fraunces"; src: url(../flyer/fonts/fraunces-latin-300-normal.woff2) format("woff2"); font-weight: 300; }
+  @font-face { font-family: "Fraunces"; src: url(../flyer/fonts/fraunces-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Fraunces"; src: url(../flyer/fonts/fraunces-latin-300-italic.woff2) format("woff2"); font-weight: 300; font-style: italic; }
+  @font-face { font-family: "Fraunces"; src: url(../flyer/fonts/fraunces-latin-400-italic.woff2) format("woff2"); font-weight: 400; font-style: italic; }
+  @font-face { font-family: "Manrope"; src: url(../flyer/fonts/manrope-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Manrope"; src: url(../flyer/fonts/manrope-latin-500-normal.woff2) format("woff2"); font-weight: 500; }
+  @font-face { font-family: "Manrope"; src: url(../flyer/fonts/manrope-latin-700-normal.woff2) format("woff2"); font-weight: 700; }
+  @font-face { font-family: "Manrope"; src: url(../flyer/fonts/manrope-latin-800-normal.woff2) format("woff2"); font-weight: 800; }
+
+  :root { --ink: #0e0d0b; --paper: #f1ebe0; --muted: #a69c8c; --brass: #c9a45c; --line: rgba(241, 235, 224, .16); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--ink); }
+  .frame { position: relative; width: 1080px; overflow: hidden; color: var(--paper); font-family: "Manrope", sans-serif; word-spacing: .06em;
+    background: var(--ink); display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr) auto; }
+  .glow { position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(520px 460px at var(--gx, 105%) var(--gy, 40%), rgba(201, 164, 92, .17), transparent 70%); }
+  .frame > *:not(.glow) { position: relative; z-index: 1; }
+
+  .top { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 22px; position: relative; }
+  .top .rule { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--line); transform-origin: left; }
+  .brand { font-family: "Fraunces", serif; font-size: 32px; }
+  .brand span { color: var(--brass); font-style: italic; }
+  .place { font-size: 17px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--muted); }
+  .kicker { font-size: 18px; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; color: var(--brass); }
+  h1 { font-family: "Fraunces", serif; font-weight: 300; line-height: .98; letter-spacing: -.025em; word-spacing: 0; }
+  h1 .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em; }
+  h1 .w > span { display: inline-block; }
+  h1 em { font-style: italic; color: var(--brass); }
+  .lead { color: rgba(241, 235, 224, .8); line-height: 1.5; }
+
+  .body { display: grid; grid-template-columns: 1fr auto; grid-template-rows: minmax(0, 1fr); min-height: 0; }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+  .points { list-style: none; display: flex; flex-direction: column; }
+  .points li { position: relative; display: grid; grid-template-columns: 62px 1fr; }
+  .points li .rule { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--line); transform-origin: left; }
+  .points .n { font-family: "Fraunces", serif; font-style: italic; color: var(--brass); line-height: 1; }
+  .points h3 { font-weight: 700; line-height: 1.25; }
+  .points p { grid-column: 2; color: var(--muted); line-height: 1.45; }
+  .offer { margin-top: auto; }
+  .offer strong { display: inline-block; border: 2px solid var(--brass); color: var(--brass); font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+  .offer p { color: var(--muted); }
+
+  .phone { position: relative; height: 100%; width: auto; aspect-ratio: 390 / 820; border-radius: 54px; padding: 11px; background: #050505; justify-self: end;
+    box-shadow: 0 0 0 2px #2c2a26, 0 60px 90px -40px rgba(0, 0, 0, .8), 0 0 140px -40px rgba(201, 164, 92, .4); }
+  .phone::before { content: ""; position: absolute; z-index: 5; top: 22px; left: 50%; width: 30%; height: 26px; transform: translateX(-50%); border-radius: 16px; background: #050505; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: hidden; background: #1d1a15; }
+  .screen img { position: absolute; left: 0; width: 100%; }
+  .confirm { position: absolute; z-index: 4; left: 5%; right: 5%; bottom: 4.5%; height: 8.5%; border-radius: 14px; background: var(--brass); color: #15110a;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; letter-spacing: .01em; box-shadow: 0 -18px 40px 6px #1d1a15; opacity: 0; }
+  .tap { position: absolute; z-index: 6; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; pointer-events: none; opacity: 0; }
+  .tap .dot { position: absolute; inset: 0; border-radius: 50%; background: rgba(241, 235, 224, .55); box-shadow: 0 0 0 2px rgba(241, 235, 224, .85); }
+  .tap .ring { position: absolute; inset: 0; border-radius: 50%; border: 3px solid rgba(241, 235, 224, .9); }
+
+  .foot { display: grid; align-items: center; position: relative; }
+  .foot > .rule { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--line); transform-origin: left; }
+  .qr { background: var(--paper); border-radius: 10px; }
+  .qr img { display: block; width: 100%; height: 100%; }
+  .cta { font-family: "Fraunces", serif; line-height: 1.1; letter-spacing: -.01em; }
+  .cta em { color: var(--brass); }
+  .url { color: var(--muted); }
+  .contact { display: flex; align-items: baseline; flex-wrap: wrap; }
+  .contact .wa { font-weight: 700; letter-spacing: .02em; }
+  .contact .lbl { font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--brass); }
+  .contact .name { width: 100%; color: var(--muted); }
+
+  /* ---- 4:5 (1080 x 1350): feed de Instagram y WhatsApp ---- */
+  .f45 { height: 1350px; padding: 64px 72px 58px; }
+  .f45 .kicker { margin-top: 36px; }
+  .f45 h1 { margin-top: 16px; font-size: 86px; }
+  .f45 .lead { margin-top: 20px; font-size: 25px; max-width: 800px; }
+  .f45 .body { margin-top: 30px; gap: 48px; }
+  .f45 .points { gap: 16px; }
+  .f45 .points li { padding-top: 16px; grid-template-columns: 56px 1fr; }
+  .f45 .points .n { font-size: 34px; }
+  .f45 .points h3 { font-size: 25px; }
+  .f45 .points p { margin-top: 5px; font-size: 20px; }
+  .f45 .offer { padding-top: 22px; }
+  .f45 .offer strong { padding: 12px 22px; font-size: 17px; }
+  .f45 .offer p { margin-top: 12px; font-size: 18px; }
+  .f45 .foot { margin-top: 30px; padding-top: 28px; grid-template-columns: 156px 1fr; gap: 40px; }
+  .f45 .qr { width: 156px; height: 156px; padding: 13px; }
+  .f45 .cta { font-size: 38px; }
+  .f45 .url { margin-top: 8px; font-size: 17px; }
+  .f45 .contact { margin-top: 14px; gap: 20px; }
+  .f45 .contact .wa { font-size: 30px; } .f45 .contact .lbl { font-size: 15px; } .f45 .contact .name { font-size: 18px; }
+
+  /* ---- 9:16 (1080 x 1920): estados de WhatsApp e historias (respeta zonas seguras) ---- */
+  .f916 { height: 1920px; padding: 172px 84px 196px; }
+  .f916 .kicker { margin-top: 52px; }
+  .f916 h1 { margin-top: 20px; font-size: 90px; }
+  .f916 .lead { margin-top: 26px; font-size: 29px; max-width: 880px; }
+  .f916 .body { margin-top: 46px; gap: 46px; }
+  .f916 .points { gap: 30px; }
+  .f916 .points li { padding-top: 24px; grid-template-columns: 62px 1fr; }
+  .f916 .points .n { font-size: 40px; }
+  .f916 .points h3 { font-size: 29px; }
+  .f916 .points p { margin-top: 9px; font-size: 23px; }
+  .f916 .offer { padding-top: 26px; }
+  .f916 .offer strong { padding: 15px 26px; font-size: 20px; }
+  .f916 .offer p { margin-top: 15px; font-size: 21px; }
+  .f916 .foot { margin-top: 44px; padding-top: 40px; grid-template-columns: 190px 1fr; gap: 44px; }
+  .f916 .qr { width: 190px; height: 190px; padding: 15px; }
+  .f916 .cta { font-size: 45px; }
+  .f916 .url { margin-top: 12px; font-size: 20px; }
+  .f916 .contact { margin-top: 18px; gap: 22px; }
+  .f916 .contact .wa { font-size: 35px; } .f916 .contact .lbl { font-size: 17px; } .f916 .contact .name { font-size: 21px; }
+</style>
+</head>
+<body>
+<div class="frame" id="frame">
+  <div class="glow" id="glow"></div>
+  <header class="top">
+    <div class="brand" data-a="0.15 .7 fade">Sebastian Morad <span>· webs con turnos</span></div>
+    <div class="place" data-a="0.3 .7 fade">Mar del Plata</div>
+    <span class="rule" data-a="0.2 1.0 line"></span>
+  </header>
+  <p class="kicker" data-a="0.55 .7 up">Barberías · Peluquerías · Spas · Nail bars</p>
+  <h1 id="h1"><span class="l">Tu local recibe turnos</span><br><em class="l">mientras dormís.</em></h1>
+  <p class="lead" data-a="1.55 .8 up">Una web con tu marca donde tus clientes reservan solos, las 24 horas. Vos te ocupás de atender.</p>
+
+  <section class="body">
+    <div class="col">
+      <ol class="points">
+        <li data-a="2.55 .75 up"><span class="rule" data-a="2.5 .8 line"></span><span class="n">01</span><h3>Reservas online 24/7</h3><p>Eligen servicio, profesional, día y horario sin escribirte.</p></li>
+        <li data-a="2.9 .75 up"><span class="rule" data-a="2.85 .8 line"></span><span class="n">02</span><h3>Menos turnos perdidos</h3><p>Seña al reservar y recordatorio por WhatsApp.</p></li>
+        <li data-a="3.25 .75 up"><span class="rule" data-a="3.2 .8 line"></span><span class="n">03</span><h3>Todo resuelto</h3><p>Agenda de tu equipo y mantenimiento: los cambios los hago&nbsp;yo.</p></li>
+      </ol>
+      <div class="offer">
+        <strong data-a="6.95 .6 pop">Primer mes sin cargo</strong>
+        <p data-a="7.2 .6 up">Abono fijo · Sin comisión por turno · Sin&nbsp;permanencia</p>
+      </div>
+    </div>
+    <div class="phone" id="phone" data-a="1.95 1.0 rise">
+      <div class="screen" id="screen">
+        <img src="s1.png" id="s1" alt=""><img src="s2.png" id="s2" alt=""><img src="s3.png" id="s3" alt=""><img src="s4.png" id="s4" alt="">
+        <div class="confirm" id="confirm">Confirmar turno · <span id="confHora"></span></div>
+        <div class="tap" id="tap"><span class="dot"></span><span class="ring"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span class="rule" data-a="7.45 .8 line"></span>
+    <div class="qr" data-a="7.65 .7 pop"><img src="../flyer/qr.svg" alt=""></div>
+    <div>
+      <p class="cta" data-a="7.85 .7 up">Escaneá y <em>probá la demo.</em></p>
+      <p class="url" data-a="8.05 .6 up">paginas-profesionales-1212.netlify.app</p>
+      <div class="contact" data-a="8.2 .7 up">
+        <span class="lbl">WhatsApp</span><span class="wa">2268 51-6801</span>
+        <span class="name">Sebastian Morad · atención en persona en Mar del Plata</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* Animación determinística: setT(segundos) dibuja el cuadro exacto de ese instante.
+   Así cada cuadro del video sale perfecto (sin depender de la velocidad de la PC). */
+(function () {
+  var q = new URLSearchParams(location.search);
+  var frame = document.getElementById("frame");
+  frame.classList.add(q.get("f") === "916" ? "f916" : "f45");
+  window.DURACION = 11.5;
+
+  // Titular: palabra por palabra
+  var h1 = document.getElementById("h1"), i = 0;
+  h1.querySelectorAll(".l").forEach(function (l) {
+    l.innerHTML = l.textContent.split(" ").map(function (w) {
+      var s = (0.75 + (i++) * 0.085).toFixed(3);
+      return '<span class="w"><span data-a="' + s + ' .85 mask">' + w + "</span></span>";
+    }).join(" ");
+  });
+
+  var clamp = function (x) { return x < 0 ? 0 : x > 1 ? 1 : x; };
+  var easeOut = function (x) { return 1 - Math.pow(1 - x, 3); };
+  var easeInOut = function (x) { return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+  var items = Array.prototype.map.call(document.querySelectorAll("[data-a]"), function (el) {
+    var a = el.getAttribute("data-a").split(" ");
+    return { el: el, s: +a[0], d: +a[1], t: a[2] };
+  });
+
+  // Pantallas y toques (posiciones medidas sobre las capturas reales)
+  var T = { s2: 4.05, s3: 5.35, s4: 6.35, fade: .28, tapDia: 3.85, tapHora: 5.15, tapOk: 6.15 };
+  var toques = null;
+  fetch("toques.json").then(function (r) { return r.json(); }).then(function (j) { toques = j; window.LISTO = true; });
+
+  function screenLayout() {
+    var sc = document.getElementById("screen"), W = sc.clientWidth, k = W / (toques ? toques.ancho : 390), sb = Math.round(W * 0.13);
+    return { k: k, sb: sb, W: W, H: sc.clientHeight };
+  }
+
+  window.setT = function (t) {
+    items.forEach(function (it) {
+      var p = clamp((t - it.s) / it.d), e = easeOut(p), st = it.el.style;
+      if (it.t === "fade") st.opacity = e;
+      else if (it.t === "up") { st.opacity = e; st.transform = "translateY(" + (1 - e) * 34 + "px)"; }
+      else if (it.t === "mask") st.transform = "translateY(" + (1 - e) * 108 + "%)";
+      else if (it.t === "line") st.transform = "scaleX(" + easeInOut(p) + ")";
+      else if (it.t === "pop") { st.opacity = e; st.transform = "scale(" + (0.94 + 0.06 * e) + ")"; }
+      else if (it.t === "rise") { st.opacity = e; st.transform = "translateY(" + (1 - e) * 140 + "px)"; }
+    });
+    // Brillo de fondo que se mueve muy lento (da vida sin distraer)
+    var g = document.getElementById("glow");
+    g.style.setProperty("--gx", (104 - 8 * Math.sin(t / DURACION * Math.PI)) + "%");
+    g.style.setProperty("--gy", (38 + 10 * (t / DURACION)) + "%");
+
+    // Pantallas del celular (fundido entre estados)
+    var op = function (start) { return easeInOut(clamp((t - start) / T.fade)); };
+    document.getElementById("s1").style.opacity = 1;
+    document.getElementById("s2").style.opacity = op(T.s2);
+    document.getElementById("s3").style.opacity = op(T.s3);
+    var o4 = op(T.s4); document.getElementById("s4").style.opacity = o4;
+    document.getElementById("s4").style.transform = "scale(" + (0.985 + 0.015 * o4) + ")";
+
+    var L = screenLayout();
+    // Desplazamiento de la pantalla (como si bajara con el dedo) para que el horario quede visible
+    var visibleCss = (L.H - L.sb) / L.k, falta = toques ? Math.max(0, toques.tapHora.y + 60 - visibleCss) : 0;
+    var off = falta * easeInOut(clamp((t - 4.45) / .5));
+    ["s1", "s2", "s3"].forEach(function (id) { document.getElementById(id).style.top = (L.sb - off * L.k) + "px"; });
+    document.getElementById("s4").style.top = L.sb + "px";
+    // Barra "Confirmar turno" que aparece al elegir horario y se toca
+    var cb = document.getElementById("confirm"), cIn = easeOut(clamp((t - (T.s3 + .15)) / .45));
+    cb.style.opacity = cIn * (1 - o4);
+    cb.style.transform = "translateY(" + (1 - cIn) * 40 + "px) scale(" + (t >= T.tapOk && t < T.tapOk + .2 ? .97 : 1) + ")";
+    cb.style.fontSize = Math.round(15 * L.k) + "px";
+    if (toques) document.getElementById("confHora").textContent = toques.hora;
+
+    // Toque del dedo
+    var tap = document.getElementById("tap"), cur = null;
+    if (toques) {
+      if (t >= T.tapDia - .1 && t < T.tapDia + .55) cur = { at: T.tapDia, x: toques.tapDia.x, y: toques.tapDia.y };
+      else if (t >= T.tapHora - .1 && t < T.tapHora + .55) cur = { at: T.tapHora, x: toques.tapHora.x, y: toques.tapHora.y - off };
+      else if (t >= T.tapOk - .1 && t < T.tapOk + .55) { var cb = document.getElementById("confirm"); cur = { at: T.tapOk, x: (toques.ancho / 2), y: (cb.offsetTop + cb.offsetHeight / 2 - L.sb) / L.k }; }
+    }
+    if (cur) {
+      var d = t - cur.at;
+      tap.style.left = cur.x * L.k + "px"; tap.style.top = (L.sb + cur.y * L.k) + "px";
+      var size = Math.max(34, 46 * L.k / 2.2);
+      tap.style.width = tap.style.height = size + "px"; tap.style.margin = (-size / 2) + "px 0 0 " + (-size / 2) + "px";
+      var inP = clamp((d + .1) / .12), outP = clamp((d - .18) / .3);
+      tap.style.opacity = inP * (1 - outP);
+      tap.querySelector(".dot").style.transform = "scale(" + (0.7 + 0.3 * inP - 0.15 * clamp(d / .12)) + ")";
+      var rp = clamp(d / .5);
+      tap.querySelector(".ring").style.transform = "scale(" + (1 + 1.3 * easeOut(rp)) + ")";
+      tap.querySelector(".ring").style.opacity = d < 0 ? 0 : (1 - rp);
+    } else tap.style.opacity = 0;
+  };
+  setT(+(q.get("t") || 0));
+})();
+</script>
+</body>
+</html>
