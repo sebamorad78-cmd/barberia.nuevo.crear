@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Carrusel · Webs con turnos online</title>
+<style>
+  @font-face { font-family: "Fraunces"; src: url(../flyer/fonts/fraunces-latin-300-normal.woff2) format("woff2"); font-weight: 300; }
+  @font-face { font-family: "Fraunces"; src: url(../flyer/fonts/fraunces-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Fraunces"; src: url(../flyer/fonts/fraunces-latin-300-italic.woff2) format("woff2"); font-weight: 300; font-style: italic; }
+  @font-face { font-family: "Fraunces"; src: url(../flyer/fonts/fraunces-latin-400-italic.woff2) format("woff2"); font-weight: 400; font-style: italic; }
+  @font-face { font-family: "Manrope"; src: url(../flyer/fonts/manrope-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Manrope"; src: url(../flyer/fonts/manrope-latin-500-normal.woff2) format("woff2"); font-weight: 500; }
+  @font-face { font-family: "Manrope"; src: url(../flyer/fonts/manrope-latin-600-normal.woff2) format("woff2"); font-weight: 600; }
+  @font-face { font-family: "Manrope"; src: url(../flyer/fonts/manrope-latin-700-normal.woff2) format("woff2"); font-weight: 700; }
+  @font-face { font-family: "Manrope"; src: url(../flyer/fonts/manrope-latin-800-normal.woff2) format("woff2"); font-weight: 800; }
+
+  :root { --ink: #0e0d0b; --paper: #f1ebe0; --muted: #a69c8c; --brass: #c9a45c; --line: rgba(241, 235, 224, .16); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #2a2824; }
+  body { display: flex; flex-direction: column; gap: 40px; padding: 40px; align-items: center; }
+
+  .slide { position: relative; width: 1080px; height: 1350px; overflow: hidden; padding: 84px 84px 0; color: var(--paper); font-family: "Manrope", sans-serif; word-spacing: .04em;
+    background: radial-gradient(760px 640px at 105% 40%, rgba(201, 164, 92, .15), transparent 70%), var(--ink);
+    display: flex; flex-direction: column; }
+
+  /* Marco común: marca arriba, número de placa, indicador abajo */
+  .top { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 30px; border-bottom: 2px solid var(--line); }
+  .brand { font-family: "Fraunces", serif; font-size: 34px; }
+  .brand span { color: var(--brass); font-style: italic; }
+  .num { font-size: 20px; font-weight: 700; letter-spacing: .26em; color: var(--muted); }
+  .num b { color: var(--brass); font-weight: 700; }
+  .bottom { position: absolute; left: 84px; right: 84px; bottom: 64px; display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
+  .dots { display: flex; gap: 10px; }
+  .dots i { width: 34px; height: 4px; border-radius: 2px; background: var(--line); }
+  .dots i.on { background: var(--brass); }
+  .swipe::after { content: "  →"; color: var(--brass); letter-spacing: 0; }
+
+  .kicker { margin-top: 70px; font-size: 21px; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; color: var(--brass); }
+  h1 { margin-top: 26px; font-family: "Fraunces", serif; font-weight: 300; font-size: 86px; line-height: 1.02; letter-spacing: -.025em; word-spacing: 0; }
+  h1 em { font-style: italic; color: var(--brass); }
+  .lead { margin-top: 28px; max-width: 800px; font-size: 30px; line-height: 1.5; color: rgba(241, 235, 224, .78); }
+
+  /* Celular */
+  .phone { position: absolute; width: 400px; aspect-ratio: 390 / 812; border-radius: 58px; padding: 12px; background: #050505;
+    box-shadow: 0 0 0 2px #2c2a26, 0 60px 90px -40px rgba(0, 0, 0, .8), 0 0 140px -50px rgba(201, 164, 92, .45); }
+  .phone::before { content: ""; position: absolute; z-index: 2; top: 22px; left: 50%; width: 100px; height: 28px; transform: translateX(-50%); border-radius: 16px; background: #050505; }
+  .screen { width: 100%; height: 100%; border-radius: 46px; overflow: hidden; position: relative; background: #1d1a15; }
+  .status { height: 46px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px 0 38px; font-size: 16px; font-weight: 700; background: var(--sb, #0e0d0b); color: var(--sc, var(--paper)); }
+  .status .ic { display: flex; align-items: flex-end; gap: 2px; }
+  .status .ic i { display: block; width: 3.5px; background: currentColor; border-radius: 1px; }
+  .status .ic i:nth-child(1) { height: 5px; } .status .ic i:nth-child(2) { height: 8px; } .status .ic i:nth-child(3) { height: 11px; } .status .ic i:nth-child(4) { height: 14px; }
+  .status .ic b { display: block; margin-left: 6px; width: 25px; height: 13px; border: 1.6px solid currentColor; border-radius: 4px; position: relative; }
+  .status .ic b::after { content: ""; position: absolute; inset: 1.6px 5px 1.6px 1.6px; background: currentColor; border-radius: 1.5px; }
+  .screen img { display: block; width: 100%; }
+  .light { --sb: #f7f2ec; --sc: #1b1714; }
+
+  /* 1 · El problema: chat sin responder */
+  .chat { margin-top: 52px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+  .bubble { position: relative; max-width: 640px; padding: 18px 28px 16px; border-radius: 6px 30px 30px 30px; background: #1c1a16; border: 2px solid rgba(241, 235, 224, .08); font-size: 30px; line-height: 1.35; }
+  .bubble small { display: block; margin-top: 6px; font-size: 19px; color: var(--muted); text-align: right; }
+  .bubble:nth-child(2) { margin-left: 46px; } .bubble:nth-child(3) { margin-left: 92px; } .bubble:nth-child(4) { margin-left: 138px; }
+  .after { margin-top: 44px; padding-top: 30px; border-top: 2px solid var(--line); font-family: "Fraunces", serif; font-size: 40px; line-height: 1.3; font-weight: 300; }
+  .after em { display: block; }
+  .after em { color: var(--brass); font-style: italic; }
+
+  /* 2 · La solución: un diseño por rubro */
+  .fan { position: absolute; left: 0; right: 0; bottom: 175px; height: 560px; }
+  .fan .phone { width: 244px; border-radius: 40px; padding: 8px; }
+  .fan .phone::before { top: 15px; width: 66px; height: 18px; }
+  .fan .screen { border-radius: 32px; }
+  .fan .status { height: 30px; font-size: 11px; padding: 0 20px 0 26px; }
+  .fan .status .ic i { width: 2.4px; } .fan .status .ic b { width: 17px; height: 9px; border-width: 1.2px; }
+  .fan figure { position: absolute; bottom: 0; }
+  .fan figcaption { position: absolute; left: 0; right: 0; bottom: -50px; text-align: center; font-size: 19px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .fan .phone { position: relative; }
+
+  /* 3 · Cómo reservan */
+  .steps { list-style: none; margin-top: 54px; width: 470px; display: flex; flex-direction: column; gap: 26px; }
+  .steps li { display: grid; grid-template-columns: 62px 1fr; padding-top: 24px; border-top: 2px solid var(--line); }
+  .steps .n { font-family: "Fraunces", serif; font-style: italic; font-size: 38px; line-height: 1; color: var(--brass); }
+  .steps h3 { font-size: 28px; font-weight: 700; line-height: 1.25; }
+  .steps p { grid-column: 2; margin-top: 8px; font-size: 22px; line-height: 1.45; color: var(--muted); }
+
+  /* 4 · Panel del dueño */
+  .laptop { position: absolute; left: 84px; bottom: 300px; width: 860px; }
+  .laptop .lid { border-radius: 22px 22px 0 0; padding: 16px 16px 20px; background: #050505; box-shadow: 0 0 0 2px #2c2a26, 0 0 160px -60px rgba(201, 164, 92, .4); }
+  .laptop .lid img { display: block; width: 100%; border-radius: 6px; }
+  .laptop .base { height: 22px; margin: 0 -60px; border-radius: 0 0 26px 26px; background: linear-gradient(#2b2924, #151410); box-shadow: 0 40px 60px -30px rgba(0, 0, 0, .9); }
+  .laptop .base::before { content: ""; display: block; width: 150px; height: 8px; margin: 0 auto; border-radius: 0 0 8px 8px; background: #0a0907; }
+  .feats { position: absolute; left: 84px; right: 84px; bottom: 150px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .feats div { padding-top: 20px; border-top: 2px solid var(--line); font-size: 22px; font-weight: 700; line-height: 1.3; }
+  .feats span { display: block; margin-bottom: 8px; font-family: "Fraunces", serif; font-style: italic; font-weight: 400; font-size: 26px; color: var(--brass); }
+
+  /* 5 · Contacto */
+  .offer { margin-top: 40px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .offer span { padding: 14px 24px; border: 2px solid var(--line); border-radius: 999px; font-size: 22px; font-weight: 600; color: rgba(241, 235, 224, .85); }
+  .close { position: absolute; left: 84px; right: 84px; bottom: 150px; display: grid; grid-template-columns: 300px 1fr; gap: 56px; align-items: center; padding-top: 56px; border-top: 2px solid var(--line); }
+  .qr { width: 300px; height: 300px; padding: 26px; background: var(--paper); border-radius: 14px; }
+  .qr img { display: block; width: 100%; height: 100%; }
+  .cta { font-family: "Fraunces", serif; font-size: 50px; line-height: 1.1; letter-spacing: -.01em; }
+  .cta em { color: var(--brass); }
+  .url { margin-top: 14px; font-size: 22px; color: var(--muted); }
+  .wa { margin-top: 36px; display: flex; align-items: baseline; gap: 22px; }
+  .wa .lbl { font-size: 19px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--brass); }
+  .wa .tel { font-size: 46px; font-weight: 700; letter-spacing: .01em; }
+  .who { margin-top: 10px; font-size: 22px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- 1 · El problema -->
+<section class="slide" id="s1">
+  <header class="top"><div class="brand">Sebastian Morad <span>· webs con turnos</span></div><div class="num"><b>01</b> / 05</div></header>
+  <p class="kicker">Barberías · Peluquerías · Spas · Nail bars</p>
+  <h1>Mientras atendés,<br><em>el turno se va.</em></h1>
+  <div class="chat">
+    <p class="bubble">Hola! ¿Tenés turno para mañana?<small>21:47</small></p>
+    <p class="bubble">Corte y barba, a la tarde<small>21:48</small></p>
+    <p class="bubble">Si puede ser con Martín<small>22:15</small></p>
+    <p class="bubble">¿Hola?<small>23:02</small></p>
+  </div>
+  <p class="after">Lo leíste a la mañana. <em>Ya había reservado en otro lado.</em></p>
+  <footer class="bottom"><div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div><span class="swipe">Deslizá</span></footer>
+</section>
+
+<!-- 2 · La solución -->
+<section class="slide" id="s2">
+  <header class="top"><div class="brand">Sebastian Morad <span>· webs con turnos</span></div><div class="num"><b>02</b> / 05</div></header>
+  <p class="kicker">La solución</p>
+  <h1>Tu web, con tu marca. <em>Reservan solos, 24/7.</em></h1>
+  <p class="lead">Servicios, precios, equipo, horarios y reserva online. Un diseño pensado para cada rubro.</p>
+  <div class="fan">
+    <figure style="left:78px; transform: rotate(-5deg); bottom: 10px"><div class="phone"><div class="screen"><div class="status"><span>9:41</span><span class="ic"><i></i><i></i><i></i><i></i><b></b></span></div><img src="web-barberia.png" alt=""></div></div><figcaption>Barbería</figcaption></figure>
+    <figure style="left:308px; transform: rotate(-1.5deg); bottom: 40px; z-index: 2"><div class="phone light"><div class="screen"><div class="status"><span>9:41</span><span class="ic"><i></i><i></i><i></i><i></i><b></b></span></div><img src="web-salon.png" alt=""></div></div><figcaption>Salón</figcaption></figure>
+    <figure style="left:530px; transform: rotate(1.5deg); bottom: 40px; z-index: 2"><div class="phone light" style="--sb:#eef0ea"><div class="screen"><div class="status"><span>9:41</span><span class="ic"><i></i><i></i><i></i><i></i><b></b></span></div><img src="web-spa.png" alt=""></div></div><figcaption>Spa</figcaption></figure>
+    <figure style="left:760px; transform: rotate(5deg); bottom: 10px"><div class="phone" style="--sb:#120f10"><div class="screen"><div class="status"><span>9:41</span><span class="ic"><i></i><i></i><i></i><i></i><b></b></span></div><img src="web-unas.png" alt=""></div></div><figcaption>Nail bar</figcaption></figure>
+  </div>
+  <footer class="bottom"><div class="dots"><i></i><i class="on"></i><i></i><i></i><i></i></div><span class="swipe">Deslizá</span></footer>
+</section>
+
+<!-- 3 · Cómo reservan -->
+<section class="slide" id="s3">
+  <header class="top"><div class="brand">Sebastian Morad <span>· webs con turnos</span></div><div class="num"><b>03</b> / 05</div></header>
+  <p class="kicker">Cómo reservan tus clientes</p>
+  <h1>Sin escribirte.<br><em>Sin esperar.</em></h1>
+  <ol class="steps">
+    <li><span class="n">01</span><h3>Eligen servicio y profesional</h3><p>Con precios y duración a la vista.</p></li>
+    <li><span class="n">02</span><h3>Día y horario libre</h3><p>Los ocupados no se pueden tomar: cero turnos superpuestos.</p></li>
+    <li><span class="n">03</span><h3>Confirman en segundos</h3><p>Con seña opcional por Mercado Pago o transferencia.</p></li>
+    <li><span class="n">04</span><h3>Vos lo ves al instante</h3><p>El turno aparece en tu panel, en la agenda de cada profesional.</p></li>
+  </ol>
+  <div class="phone" style="right: 84px; top: 470px; width: 370px"><div class="screen"><div class="status"><span>9:41</span><span class="ic"><i></i><i></i><i></i><i></i><b></b></span></div><img src="../video/nav.png" alt=""><img src="../video/s3.png" alt=""></div></div>
+  <footer class="bottom"><div class="dots"><i></i><i></i><i class="on"></i><i></i><i></i></div><span class="swipe">Deslizá</span></footer>
+</section>
+
+<!-- 4 · Panel del dueño -->
+<section class="slide" id="s4">
+  <header class="top"><div class="brand">Sebastian Morad <span>· webs con turnos</span></div><div class="num"><b>04</b> / 05</div></header>
+  <p class="kicker">Tu panel</p>
+  <h1>Toda tu agenda,<br><em>en un solo lugar.</em></h1>
+  <div class="laptop"><div class="lid"><img src="panel-pc.png" alt=""></div><div class="base"></div></div>
+  <div class="phone" style="right: 70px; bottom: 250px; width: 250px; border-radius: 38px; padding: 8px"><div class="screen" style="border-radius: 30px"><div class="status" style="height: 28px; font-size: 11px; padding: 0 18px 0 24px"><span>9:41</span><span class="ic"><i></i><i></i><i></i><i></i><b style="width:17px;height:9px"></b></span></div><img src="panel-movil.png" alt=""></div></div>
+  <div class="feats">
+    <div><span>Agenda</span>por profesional, día a día</div>
+    <div><span>Bloqueos</span>de horarios y feriados</div>
+    <div><span>Clientes</span>y recordatorios por WhatsApp</div>
+    <div><span>Números</span>de facturación y ausencias</div>
+  </div>
+  <footer class="bottom"><div class="dots"><i></i><i></i><i></i><i class="on"></i><i></i></div><span class="swipe">Deslizá</span></footer>
+</section>
+
+<!-- 5 · Contacto -->
+<section class="slide" id="s5">
+  <header class="top"><div class="brand">Sebastian Morad <span>· webs con turnos</span></div><div class="num"><b>05</b> / 05</div></header>
+  <p class="kicker">Mar del Plata</p>
+  <h1>Te armo una demo<br><em>con el nombre de tu local.</em></h1>
+  <p class="lead">Sin compromiso. Te la muestro en persona y la probás con tu equipo.</p>
+  <div class="offer"><span>Abono fijo mensual</span><span>Sin comisión por turno</span><span>Sin permanencia</span><span>Mantenimiento incluido</span></div>
+  <div class="close">
+    <div class="qr"><img src="../flyer/qr.svg" alt="Código QR a la demo"></div>
+    <div>
+      <p class="cta">Escaneá y <em>probá la demo.</em></p>
+      <p class="url">paginas-profesionales-1212.netlify.app</p>
+      <div class="wa"><span class="lbl">WhatsApp</span><span class="tel">2268 51-6801</span></div>
+      <p class="who">Sebastian Morad · atención en persona</p>
+    </div>
+  </div>
+  <footer class="bottom"><div class="dots"><i></i><i></i><i></i><i></i><i class="on"></i></div><span>Guardalo para después</span></footer>
+</section>
+
+</body>
+</html>

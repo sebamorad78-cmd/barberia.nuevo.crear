@@ -40,9 +40,9 @@ body.admin { min-height: 100vh; }
 
 /* KPIs */
 .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 26px; }
-.kpi { padding: 18px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 4px; min-width: 0; }
+.kpi { padding: 18px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 4px; min-width: 0; container-type: inline-size; }
 .kpi span { font-size: 12px; color: var(--muted); font-weight: 600; }
-.kpi strong { font-family: var(--font-display); font-weight: 400; font-size: 1.75rem; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.1rem, 14.5cqi, 1.75rem); line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kpi small { font-size: 12px; color: var(--muted); }
 .kpi:first-child { background: linear-gradient(140deg, color-mix(in srgb, var(--accent) 20%, var(--surface)), var(--surface)); }
 
