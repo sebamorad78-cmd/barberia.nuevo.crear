@@ -11,8 +11,8 @@ Uso:
   python3 tools/rubros.py --url https://tu-sitio.netlify.app        # páginas
   python3 tools/rubros.py --url https://tu-sitio.netlify.app --imagenes  # + imágenes (requiere Pillow)
 
-En Netlify (deploy desde GitHub) corre solo en cada publicación y toma la URL
-del sitio de la variable de entorno URL (ver netlify.toml).
+En Cloudflare Pages corre solo en cada publicación (comando de compilación) y toma
+la URL del sitio de la variable SITE_URL; en Netlify, de URL (ver netlify.toml).
 """
 import argparse
 import html
@@ -77,9 +77,9 @@ VENDER = {
 VENDER.update({k: RUBROS["barberia"][k] for k in ("bg", "surface", "surface2", "text", "muted", "accent", "on_accent", "mesh1", "mesh2")})
 
 ORDEN = ["barberia", "salon", "spa", "unas"]
-# URL usada si no se pasa --url ni existe la variable URL (deploy arrastrando la carpeta).
-# Poné acá el nombre exacto de tu sitio en Netlify.
-SITIO_POR_DEFECTO = "https://paginas-profesionales-1212.netlify.app"
+# URL usada si no se pasa --url ni existen las variables SITE_URL (Cloudflare Pages,
+# se carga en la configuración del proyecto) o URL (Netlify).
+SITIO_POR_DEFECTO = "https://paginas-profesionales.pages.dev"
 MARCA_INI, MARCA_FIN = "<!-- OG:START", "<!-- OG:END -->"
 
 
@@ -229,7 +229,8 @@ def generar_imagen(d, destino):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--url", default=os.environ.get("URL", SITIO_POR_DEFECTO), help="URL pública del sitio, ej. https://turnos.netlify.app")
+    ap.add_argument("--url", default=os.environ.get("SITE_URL") or os.environ.get("URL") or SITIO_POR_DEFECTO,
+                    help="URL pública del sitio, ej. https://paginas-profesionales.pages.dev")
     ap.add_argument("--imagenes", action="store_true", help="regenerar también las imágenes de vista previa")
     a = ap.parse_args()
     base = a.url.rstrip("/")

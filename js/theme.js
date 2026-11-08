@@ -27,7 +27,25 @@
     r.style.setProperty("--on-accent", lum > 0.6 ? "#14110b" : "#ffffff");
   }
 
+  // Entrada de cine: cada vez que se abre la página (?intro=0 la saltea). No
+  // corre con el panel del vendedor abierto; si el sistema pide menos
+  // movimiento, sale igual pero con fundidos (ver styles.css). La clase se pone acá, antes de que se pinte nada: la página
+  // queda oculta desde el primer cuadro y main.js arma la entrada encima.
+  try {
+    var P = C.params || {};
+    var panel = /\/admin(\.html)?$/.test(location.pathname); // el panel del dueño no tiene entrada
+    if (P.intro !== "0" && !C.mostrarSelectorDemo && !panel) {
+      r.classList.add("intro-on");
+      // Si algo falla, la página nunca queda tapada.
+      setTimeout(function () { r.classList.remove("intro-on"); }, 10000);
+    }
+  } catch (e) {}
+
   var meta = document.querySelector('meta[name="theme-color"]');
   var BG = { barberia: "#0e0d0b", salon: "#faf6f1", spa: "#f1f2ec", unas: "#131012" };
-  if (meta) meta.setAttribute("content", BG[modo] || BG.barberia);
+  if (meta) {
+    meta.setAttribute("content", BG[modo] || BG.barberia);
+    // Durante la entrada, la barra del navegador también va en negro.
+    if (r.classList.contains("intro-on")) { meta.setAttribute("data-after", BG[modo] || BG.barberia); meta.setAttribute("content", "#050504"); }
+  }
 })();

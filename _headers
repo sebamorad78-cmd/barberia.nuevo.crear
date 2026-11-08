@@ -1,0 +1,21 @@
+# Cloudflare Pages: cuánto tiempo guarda el navegador cada archivo.
+# HTML siempre fresco; CSS y JS se guardan una semana (se renuevan con ?v=FECHA).
+/*.html
+  Cache-Control: no-cache
+/
+  Cache-Control: no-cache
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+/css/*
+  Cache-Control: public, max-age=604800
+/js/*
+  Cache-Control: public, max-age=604800
+# Las filmaciones de las entradas no cambian de nombre si se rehacen: un día.
+/assets/intro/*
+  Cache-Control: public, max-age=86400
+/assets/og/*
+  Cache-Control: public, max-age=86400
+# El panel no debe aparecer en Google
+/admin.html
+  X-Robots-Tag: noindex

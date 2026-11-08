@@ -122,6 +122,8 @@
   /* ------------------------------------------------------------------ */
   var barberia = {
     tipo: "Barbería",
+    insignia: "años cuidando tu estilo",
+    ctaFinal: "¿Listo para tu próximo <em>cambio</em>?",
     schemaTipo: "BarberShop",
     promos: [
       { etiqueta: "Membresía", titulo: "Club Imperio", texto: "2 cortes + 2 perfilados de barba por mes ($50.000 por separado), con prioridad de agenda.", precio: "$40.000 / mes" },
@@ -185,6 +187,8 @@
   /* ------------------------------------------------------------------ */
   var salon = {
     tipo: "Salón de belleza",
+    insignia: "años cuidando tu estilo",
+    ctaFinal: "Tu próximo <em>cambio</em> empieza acá.",
     schemaTipo: "BeautySalon",
     promos: [
       { etiqueta: "Novias", titulo: "Paquete novia", texto: "Prueba de peinado y maquillaje + día del evento, con atención a domicilio opcional.", precio: "Consultar" },
@@ -251,6 +255,8 @@
   /* ------------------------------------------------------------------ */
   var spa = {
     tipo: "Spa & estética",
+    insignia: "años cuidando tu bienestar",
+    ctaFinal: "Tu próxima <em>pausa</em> empieza acá.",
     schemaTipo: "DaySpa",
     nombre: "Salvia Spa",
     nombreCorto: "Salvia",
@@ -313,6 +319,8 @@
   /* ------------------------------------------------------------------ */
   var unas = {
     tipo: "Nail bar",
+    insignia: "años cuidando tus manos",
+    ctaFinal: "Tu próximo <em>set</em> empieza acá.",
     schemaTipo: "NailSalon",
     nombre: "Nude Nail Bar",
     nombreCorto: "Nude",
@@ -365,7 +373,7 @@
       { p: "¿Tienen garantía?", r: "Si algo se levanta en las primeras 72 h, lo reparamos sin cargo." }
     ],
     promos: [
-      { etiqueta: "Fidelidad", titulo: "Tu 6° service, gratis", texto: "Sumá sellos digitales en cada visita y canjealos cuando quieras.", precio: "Club Nude" },
+      { etiqueta: "Fidelidad", titulo: "Tu 6.º service, gratis", texto: "Sumá sellos digitales en cada visita y canjealos cuando quieras.", precio: "Club Nude" },
       { etiqueta: "Regalo", titulo: "Gift card", texto: "Regalá un set completo o elegí el monto. Llega por WhatsApp.", precio: "Desde $17.500" },
       { etiqueta: "Amigas", titulo: "Vení con una amiga", texto: "Reservando dos turnos a la misma hora, 15% off para las dos.", precio: "15% off" }
     ]
@@ -410,8 +418,10 @@
   if (q.alias) cfg.sena.alias = q.alias.slice(0, 40);
   if (/^#?[0-9a-f]{6}$/i.test(q.color || "")) cfg.color = "#" + q.color.replace("#", "");
 
-  // "limpio=1" oculta el panel de edición: es el link que le mandás al local.
-  cfg.mostrarSelectorDemo = MOSTRAR_SELECTOR_DEMO && q.limpio !== "1";
+  // El panel de edición (lápiz y "Maqueta para un local") aparece solo con
+  // "editar=1", el link del vendedor. Cualquier otro link, incluidos los viejos
+  // con "panel=1" que ya se mandaron, muestra la web limpia.
+  cfg.mostrarSelectorDemo = MOSTRAR_SELECTOR_DEMO && q.editar === "1" && q.limpio !== "1";
   cfg.esDemo = MOSTRAR_SELECTOR_DEMO;
   cfg.vendedor = VENDEDOR;
   cfg.backend = BACKEND.slug ? BACKEND : null;

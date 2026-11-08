@@ -666,3 +666,93 @@ em { font-style: italic; color: var(--accent); }
   .price { grid-template-columns: 1fr auto; }
   .price__name, .price__value { font-size: 1.25rem; }
 }
+
+/* ---------- Entrada de cine ----------
+   Filmación del rubro a pantalla completa (assets/intro/: vertical para el
+   celular, horizontal para la computadora). El nombre del local aparece sobre
+   la imagen como el título de una película, en texto real, con una entrada
+   propia de cada rubro. Después la tapa sube como un telón. Un toque la saltea. */
+.intro { --intro-bg: #050504; --intro-acc: #d8b56c; }
+[data-theme="salon"] .intro { --intro-acc: #e7b9bb; }
+[data-theme="spa"] .intro { --intro-acc: #d9c79c; }
+[data-theme="unas"] .intro { --intro-acc: #f0b6c3; }
+/* Mientras corre la entrada la página está oculta, no solo tapada: ningún
+   navegador llega a mostrarla antes de tiempo. */
+html.intro-on, html.intro-on body { overflow: hidden; background: var(--intro-bg) !important; }
+html.intro-on body > :not(.intro) { visibility: hidden; }
+html.intro-on { --intro-bg: #050504; }
+/* La portada espera detrás del telón y arranca cuando se levanta. */
+html.intro-on .hero *, html.intro-on .hero *::before { animation-play-state: paused !important; }
+
+.intro { position: fixed; inset: 0; z-index: 9999; overflow: hidden; background: var(--intro-bg); color: #fff; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; clip-path: inset(0 0 0 0); }
+.intro:not(.is-go) * { animation-play-state: paused !important; }
+.intro.is-out { clip-path: inset(0 0 100% 0); transition: clip-path 1s cubic-bezier(.76,0,.24,1); }
+.intro__film, .intro__film video, .intro__film img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.intro__film { transition: transform 1s cubic-bezier(.76,0,.24,1); }
+.intro.is-out .intro__film { transform: translateY(-12vh) scale(1.04); }
+/* Sombra de cine abajo para que el título se lea sobre cualquier toma. */
+.intro__shade { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,.28) 0%, transparent 22%, transparent 48%, rgba(0,0,0,.72) 100%); }
+
+.intro__title { position: absolute; left: 0; right: 0; bottom: max(13vh, calc(env(safe-area-inset-bottom) + 72px)); padding: 0 7vw;
+  display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 1.6vh, 16px); text-align: center; }
+.intro__name { margin: 0; font-family: var(--font-display); font-weight: var(--display-weight, 400); line-height: 1.05;
+  font-size: clamp(34px, 9.6vw, 80px); letter-spacing: .02em; color: #fff; text-wrap: balance;
+  text-shadow: 0 2px 24px rgba(0,0,0,.35); -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; opacity: 0; }
+.intro__line { display: flex; align-items: center; gap: 12px; white-space: nowrap; font-family: var(--font-body); font-size: clamp(8.5px, 2.2vw, 11.5px);
+  font-weight: 600; letter-spacing: .3em; text-transform: uppercase; color: var(--intro-acc); opacity: 0;
+  animation: introFade 1.1s ease 2.05s forwards; }
+.intro__line::before, .intro__line::after { content: ""; width: 26px; height: 1px; background: currentColor; opacity: .7; }
+@keyframes introFade { to { opacity: 1; } }
+
+/* Cada rubro entra a su manera. */
+/* Barbería: el nombre se enciende y lo cruza un brillo de metal pulido. */
+[data-theme="barberia"] .intro__name { background: linear-gradient(100deg, #fff 0 38%, var(--intro-acc) 46%, #fff8e6 50%, var(--intro-acc) 54%, #fff 62%) no-repeat;
+  background-size: 300% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: introOn 1.2s ease 1.15s forwards, introMetal 1.6s cubic-bezier(.4,0,.2,1) 1.5s forwards; }
+@keyframes introMetal { to { background-position: 0 0; } }
+/* Salón: aparece de izquierda a derecha, como un paño de seda que se corre. */
+[data-theme="salon"] .intro__name { font-style: italic; -webkit-mask: linear-gradient(90deg, #000 40%, transparent 60%) 100% 0 / 260% 100% no-repeat;
+  mask: linear-gradient(90deg, #000 40%, transparent 60%) 100% 0 / 260% 100% no-repeat; opacity: 1;
+  animation: introSilk 1.8s cubic-bezier(.45,0,.2,1) 1.1s forwards; }
+@keyframes introSilk { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; letter-spacing: .08em; } to { -webkit-mask-position: 0 0; mask-position: 0 0; letter-spacing: .02em; } }
+/* Spa: se forma desde una bruma, despacio. */
+[data-theme="spa"] .intro__name { animation: introMist 2.2s cubic-bezier(.2,.6,.2,1) 1.05s forwards; }
+@keyframes introMist { from { opacity: 0; filter: blur(18px); transform: scale(1.06); letter-spacing: .12em; } to { opacity: 1; filter: blur(0); transform: none; letter-spacing: .02em; } }
+/* Uñas: un trazo de esmalte que se pinta y queda con brillo. */
+[data-theme="unas"] .intro__name { background: linear-gradient(100deg, #fff 0 40%, #fff 46%, #ffe3ea 49%, #fff 52%, #fff 100%) no-repeat;
+  background-size: 300% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-mask: linear-gradient(90deg, #000 45%, transparent 55%) 100% 0 / 240% 100% no-repeat; mask: linear-gradient(90deg, #000 45%, transparent 55%) 100% 0 / 240% 100% no-repeat;
+  opacity: 1; animation: introPaint 1.3s cubic-bezier(.6,0,.3,1) 1.15s forwards, introMetal 1.1s ease 2.3s forwards; }
+@keyframes introPaint { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; } to { -webkit-mask-position: 0 0; mask-position: 0 0; } }
+@keyframes introOn { from { opacity: 0; letter-spacing: .1em; } to { opacity: 1; letter-spacing: .02em; } }
+/* Turno confirmado: el mismo lenguaje de la entrada, más breve. La última
+   imagen de la filmación, desenfocada, y el título con la entrada del rubro. */
+.intro--done { animation: introFade .45s ease both; opacity: 0; }
+.intro--done .intro__film img { filter: blur(18px) brightness(.72); transform: scale(1.12); }
+.intro--done .intro__shade { background: radial-gradient(70% 60% at 50% 60%, rgba(0,0,0,.15), rgba(0,0,0,.55)); }
+.intro--done .intro__title { top: 50%; bottom: auto; transform: translateY(-50%); }
+.intro--done .intro__kicker { margin: 0; font-family: var(--font-body); font-size: clamp(9.5px, 2.4vw, 11.5px); font-weight: 600; letter-spacing: .34em;
+  text-transform: uppercase; color: var(--intro-acc); opacity: 0; animation: introFade .7s ease .15s forwards; }
+.intro--done .intro__line { animation-delay: .9s; letter-spacing: .22em; }
+[data-theme="barberia"] .intro--done .intro__name { animation-delay: .3s, .6s; }
+[data-theme="salon"] .intro--done .intro__name { animation-delay: .25s; animation-duration: 1.3s; }
+[data-theme="spa"] .intro--done .intro__name { animation-delay: .2s; animation-duration: 1.4s; }
+[data-theme="unas"] .intro--done .intro__name { animation-delay: .3s, 1.25s; }
+.intro--done.is-out { clip-path: inset(0 0 100% 0); }
+
+/* Si el sistema pide menos movimiento: la misma entrada, solo con fundidos. */
+@media (prefers-reduced-motion: reduce) {
+  .intro__name { animation: none !important; filter: none !important; transform: none !important; -webkit-mask: none !important; mask: none !important;
+    opacity: 0 !important; transition: opacity 1.4s ease 1.1s; }
+  .intro.is-go .intro__name { opacity: 1 !important; }
+  .intro--done .intro__name { transition-delay: .3s; }
+  .intro.is-out { clip-path: none; opacity: 0; transition: opacity .8s ease; }
+  .intro.is-out .intro__film { transform: none; }
+}
+
+/* Zona táctil cómoda (44 px) en los links chicos, sin cambiar cómo se ven. */
+.promo__foot a, .member button, .contact a, .footer__cols a, .footer__legal a, .link-arrow { position: relative; }
+.promo__foot a::after, .member button::after, .contact a::after, .footer__cols a::after, .footer__legal a::after, .link-arrow::after {
+  content: ""; position: absolute; inset: -10px -6px; }

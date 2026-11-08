@@ -88,8 +88,10 @@
       eslogan: C.eslogan,
       nosotrosTitulo: C.nosotrosTitulo,
       kicker: (C.tipo || "Turnos") + " · Turnos online 24/7",
-      anio: "+" + (C.cifras[0] ? C.cifras[0].valor : 10)
+      anio: "+" + (C.cifras[0] ? C.cifras[0].valor : 10),
+      insignia: C.insignia
     };
+    if (C.ctaFinal) $("#ctaTitle").innerHTML = C.ctaFinal;
     $$("[data-bind]").forEach(function (el) {
       var k = el.getAttribute("data-bind");
       if (binds[k] != null) el.textContent = binds[k];
@@ -626,14 +628,46 @@
       };
       var btn = $("#nextBtn");
       btn.disabled = true; btn.textContent = "Reservando…";
+      var fin = finImg(); // la imagen del cierre se pide ya, mientras se guarda el turno
       T.reservar(b).then(function () {
         showSuccess(b);
         renderMine();
+        playDone(b, fin);
       }, function (err) {
         btn.disabled = false; btn.textContent = "Confirmar turno";
         toast(err.message || "No pudimos reservar. Probá de nuevo.");
         if (err.codigo === "OCUPADO" || err.codigo === "FECHA_INVALIDA") { st.time = null; go(3); }
       });
+    }
+
+    /* Turno confirmado: un cierre breve con el estilo de la entrada. */
+    function finImg() {
+      var img = new Image();
+      img.src = C.root + "assets/intro/" + C.modo + "-" + (window.innerHeight > window.innerWidth ? "v" : "h") + "-fin.jpg";
+      return img;
+    }
+    function playDone(b, img) {
+      var proName = proById(b.pro).nombre;
+      var dia = cap1(DIAS[parseKey(b.date).getDay()]) + " " + parseKey(b.date).getDate();
+      var el = document.createElement("div");
+      el.className = "intro intro--done is-go";
+      el.setAttribute("role", "status");
+      el.innerHTML = '<div class="intro__film"></div><div class="intro__shade"></div><div class="intro__title">' +
+        '<p class="intro__kicker">Reserva confirmada</p><h2 class="intro__name">Te esperamos</h2>' +
+        '<p class="intro__line">' + esc(dia + " · " + b.time + " · con " + proName) + "</p></div>";
+      var film = el.querySelector(".intro__film");
+      // Si la imagen no llegó, queda el fondo oscuro: el cierre no espera a nadie.
+      if (img.complete && img.naturalWidth) film.appendChild(img); else img.onload = function () { film.appendChild(img); };
+      var done = false;
+      function leave() {
+        if (done) return;
+        done = true;
+        el.classList.add("is-out");
+        setTimeout(function () { el.remove(); }, 1050);
+      }
+      el.addEventListener("click", leave);
+      document.body.appendChild(el);
+      setTimeout(leave, 2600);
     }
 
     function showSuccess(b) {
@@ -885,23 +919,91 @@
       });
       if (colorTouched) p.set("color", form.elements.color.value.replace("#", ""));
       if (clean) p.set("limpio", "1");
-      if (keepOpen) p.set("panel", "1");
+      if (keepOpen) p.set("editar", "1");
       // Cada rubro tiene su página (/barberia/, /unas/…) con su propia vista previa para WhatsApp
       var qs = p.toString();
       return new URL(C.root + mode + "/", location.href).href + (qs ? "?" + qs : "");
     }
     form.addEventListener("submit", function (e) { e.preventDefault(); location.href = buildUrl(false, true); });
-    $("#demoReset").addEventListener("click", function () { location.href = new URL(C.root + mode + "/", location.href).href + "?panel=1"; });
+    $("#demoReset").addEventListener("click", function () { location.href = new URL(C.root + mode + "/", location.href).href + "?editar=1"; });
     $("#demoCopy").addEventListener("click", function () {
       var url = buildUrl(true, false);
       var done = function () { toast("Link copiado. Mandáselo al local por WhatsApp."); };
       if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(done, function () { window.prompt("Copiá este link:", url); });
       else window.prompt("Copiá este link:", url);
     });
-    if (P.panel === "1") setOpen(true);
+    setOpen(true);
+  }
+
+  /* Entrada de cine (theme.js decide si corre y ya tapó la página) */
+  function initIntro() {
+    var root = document.documentElement;
+    if (!root.classList.contains("intro-on")) return;
+
+    // Filmación vertical en pantallas paradas (celular) y horizontal en las apaisadas.
+    var forma = window.innerHeight > window.innerWidth ? "v" : "h";
+    var dir = C.root + "assets/intro/" + C.modo + "-" + forma;
+    // Si el celular ahorra datos, queda la foto fija de la primera toma.
+    var conn = navigator.connection || {};
+    var ahorro = conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "");
+    // Más resolución solo donde se nota y la conexión la banca: 1440p en
+    // celulares de pantalla fina, 4K en monitores y notebooks de alta definición.
+    var px = Math.max(window.innerWidth, window.innerHeight) * (window.devicePixelRatio || 1);
+    var rapida = conn.downlink == null || conn.downlink >= 8;
+    var calidad = forma === "v" ? (px > 2300 && rapida ? "2" : "") : (px > 2300 && rapida ? "4" : "");
+    var film = dir + calidad;
+    var el = document.createElement("div");
+    el.className = "intro";
+    el.setAttribute("aria-hidden", "true");
+    el.innerHTML = '<div class="intro__film"><img src="' + dir + '.jpg" alt="">' +
+      (ahorro ? "" : '<video muted playsinline preload="auto"><source src="' + film + '.mp4" type="video/mp4"><source src="' + film + '.webm" type="video/webm"></video>') +
+      '</div><div class="intro__shade"></div><div class="intro__title"><h2 class="intro__name">' + esc(C.nombre) + "</h2>" +
+      '<p class="intro__line">' + esc(C.tipo + (C.ciudad ? " · " + C.ciudad : "")) + "</p></div>";
+
+    var video = el.querySelector("video");
+    var done = false, timer;
+    function leave() {
+      if (done) return;
+      done = true; clearTimeout(timer);
+      root.classList.remove("intro-on");
+      var meta = document.querySelector('meta[name="theme-color"][data-after]');
+      if (meta) meta.setAttribute("content", meta.getAttribute("data-after"));
+      el.classList.add("is-out");
+      setTimeout(function () { el.remove(); }, 1050);
+    }
+    el.addEventListener("click", leave);
+    // Volviendo con "atrás" el navegador puede restaurar la página a mitad de la entrada: se cierra.
+    window.addEventListener("pageshow", function (e) { if (e.persisted) leave(); });
+
+    el.style.visibility = "hidden";
+    document.body.appendChild(el);
+    var title = el.querySelector(".intro__name");
+    var font = getComputedStyle(title).fontFamily.split(",")[0].replace(/["']/g, "").trim();
+    var fuente = document.fonts && document.fonts.load ? document.fonts.load('400 64px "' + font + '"') : Promise.resolve();
+    // Arranca cuando están la tipografía y el video (o a los 1,6 s con lo que haya: la foto fija cubre).
+    var listo = video ? new Promise(function (ok) {
+      if (video.readyState >= 3) ok();
+      video.addEventListener("canplay", ok, { once: true });
+      video.addEventListener("error", ok, { once: true });
+      var last = video.querySelector("source:last-child");
+      if (last) last.addEventListener("error", ok, { once: true });
+    }) : Promise.resolve();
+    Promise.race([Promise.all([fuente, listo]), new Promise(function (ok) { setTimeout(ok, 1600); })]).then(function () {
+      el.style.visibility = "";
+      el.classList.add("is-go");
+      var dur = 4.9;
+      if (video) {
+        var p = video.play();
+        if (p && p.catch) p.catch(function () { video.remove(); });
+        video.addEventListener("ended", function () { setTimeout(leave, 250); });
+        if (video.duration) dur = video.duration + 0.3;
+      }
+      timer = setTimeout(leave, dur * 1000);
+    });
   }
 
   function boot() {
+    safe(initIntro, "intro");
     safe(initContent, "content");
     safe(initServices, "services");
     safe(initPromos, "promos");
